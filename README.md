@@ -1,4 +1,4 @@
-# Mathias’s dotfiles
+# Li Kai's dotfiles (forked from Mathias’s dotfiles)
 
 ![Screenshot of my shell prompt](https://i.imgur.com/EkEtphC.png)
 
@@ -45,6 +45,17 @@ Here’s an example `~/.path` file that adds `/usr/local/bin` to the `$PATH`:
 ```bash
 export PATH="/usr/local/bin:$PATH"
 ```
+
+ ### Link instead of copy files
+
+  ```$ bootstrap -l```
+
+  or using ```source```
+
+  ```bash
+  set -- -l; source bootstrap.sh
+  ```
+
 
 ### Add custom commands without creating a new fork
 
