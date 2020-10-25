@@ -6,11 +6,11 @@ cd "$(dirname "${BASH_SOURCE}")";
 git pull origin main;
 
 function doIt() {
-	rsync --exclude ".git/" --exclude ".DS_Store" --exclude "bootstrap.sh" \
-		--exclude "README.md" --exclude "LICENSE-MIT.txt" -av --no-perms . ~
+	rsync --exclude ".git/" --exclude ".DS_Store" --exclude "*.sh" --exclude "*.md" --exclude "*.txt" \
+		-av --dry-run --no-perms . ~
 }
 function linkIt() {
-	FILES=$(find "$(pwd)" -maxdepth 1 -type f -name ".*" -not -name .DS_Store -not -name .git -not -name .macos)
+	FILES=$(find "$(pwd)" -not -path "*/.git/*" -not -name .DS_Store -not -name "*.sh" -not -name "*.md" -not -name "*.txt")
 	for file in $FILES; do
 		ln -sf ${file} ~/$(basename ${file})
 	done
