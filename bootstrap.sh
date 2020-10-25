@@ -10,9 +10,9 @@ function doIt() {
 		--exclude "README.md" --exclude "LICENSE-MIT.txt" -av --no-perms . ~
 }
 function linkIt() {
-	FILES=$(find . -type f -maxdepth 1 -name ".*" -not -name .DS_Store -not -name .git -not -name .osx | sed -e 's|//|/|' | sed -e 's|./.|.|')
+	FILES=$(find "$(pwd)" -maxdepth 1 -type f -name ".*" -not -name .DS_Store -not -name .git -not -name .macos)
 	for file in $FILES; do
-		ln -sf $(dirname "${BASH_SOURCE}")/${file} ~/${file}
+		ln -sf ${file} ~/$(basename ${file})
 	done
 }
 

@@ -26,6 +26,16 @@ Alternatively, to update while avoiding the confirmation prompt:
 set -- -f; source bootstrap.sh
 ```
 
+### Link instead of copy files
+
+```$ bootstrap -l```
+
+or using ```source```
+
+```bash
+set -- -l; source bootstrap.sh
+```
+
 ### Git-free install
 
 To install these dotfiles without Git:
@@ -45,17 +55,6 @@ Here’s an example `~/.path` file that adds `/usr/local/bin` to the `$PATH`:
 ```bash
 export PATH="/usr/local/bin:$PATH"
 ```
-
- ### Link instead of copy files
-
-  ```$ bootstrap -l```
-
-  or using ```source```
-
-  ```bash
-  set -- -l; source bootstrap.sh
-  ```
-
 
 ### Add custom commands without creating a new fork
 
