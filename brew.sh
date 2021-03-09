@@ -51,7 +51,9 @@ brew tap caskroom/cask
 # brew cask install google-chrome
 # brew cask install sublime-text3
 # brew cask install vlc
-brew cask install spectacle
+brew install --cask spectacle
+brew install --cask iterm2
+brew install --cask visual-studio-code
 
 # Remove outdated versions from the cellar.
 brew cleanup
