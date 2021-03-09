@@ -10,7 +10,7 @@ function doIt() {
 		-av --dry-run --no-perms . ~
 }
 function linkIt() {
-	FILES=$(find "$(pwd)" -not -path "*/.git/*" -not -name .DS_Store -not -name "*.sh" -not -name "*.md" -not -name "*.txt")
+	FILES=$(find "$(pwd)" -not -path "*/.git/*" -not -name .git -not -name .DS_Store -not -name "*.sh" -not -name "*.md" -not -name "*.txt")
 	for file in $FILES; do
 		ln -sf ${file} ~/$(basename ${file})
 	done
