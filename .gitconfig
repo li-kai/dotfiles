@@ -184,3 +184,6 @@
 [init]
 
 	defaultBranch = main
+[user]
+	name = Li Kai
+	email = hello+github@lik.ai

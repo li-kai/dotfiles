@@ -43,12 +43,14 @@ brew install git
 brew install git-lfs
 brew install gs
 brew install imagemagick --with-webp
+brew install z
 
 brew tap caskroom/cask
 
 # brew cask install dropbox
-# brew cask install firefox
-# brew cask install google-chrome
+brew install --cask firefox
+brew install --cask google-chrome
+brew install --cask microsoft-edge
 # brew cask install sublime-text3
 # brew cask install vlc
 brew install --cask spectacle
