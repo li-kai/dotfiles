@@ -84,4 +84,11 @@ export PATH="$HOME/.cargo/bin:$PATH";
 export NVM_DIR="${HOME}/.nvm";
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion";
-. "$HOME/.cargo/env"
+[ -s "$HOME/.cargo/env" ] && \. "$HOME/.cargo/env";
+
+# use yarn
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+# use flutter
+export PATH="$HOME/Library/Android/sdk/platform-tools:$PATH";
+export PATH="$HOME/Library/Android/sdk/tools:$PATH";
+export PATH="$HOME/repos/flutter/bin:$PATH";
