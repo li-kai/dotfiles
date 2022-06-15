@@ -188,3 +188,6 @@
 [user]
 	name = Li Kai
 	email = hello+github@lik.ai
+
+[pull]
+	ff = only
