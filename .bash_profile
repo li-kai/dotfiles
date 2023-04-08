@@ -53,11 +53,9 @@ if type _git &> /dev/null; then
 	complete -o default -o nospace -F _git g;
 fi;
 
-# Load rupa's z if installed
-if which brew &> /dev/null && [ -r "$(brew --prefix)/etc/profile.d/z.sh" ]; then
-	source "$(brew --prefix)/etc/profile.d/z.sh";
-elif [ -f /etc/profile.d/z.sh ]; then
-	source /etc/profile.d/z.sh;
+# Load zoxide if it is
+if ! command -v zoxide &> /dev/null; then
+	eval "$(zoxide init bash)"
 fi;
 
 # Add tab completion for many Bash commands
@@ -86,8 +84,11 @@ export NVM_DIR="${HOME}/.nvm";
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion";
 [ -s "$HOME/.cargo/env" ] && \. "$HOME/.cargo/env";
 
-# use yarn
-export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+if ! command -v pnpm &> /dev/null; then
+    corepack enable pnpm
+    corepack prepare pnpm@latest --activate
+fi;
+
 # use flutter
 export PATH="$HOME/Library/Android/sdk/platform-tools:$PATH";
 export PATH="$HOME/Library/Android/sdk/tools:$PATH";
