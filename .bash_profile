@@ -95,6 +95,11 @@ if command -v zoxide &> /dev/null; then
 	eval "$(zoxide init bash)"
 fi;
 
+# Load zoxide if it is
+if command -v zoxide &> /dev/null; then
+	eval "$(zoxide init bash)"
+fi;
+
 # use flutter
 export PATH="$HOME/Library/Android/sdk/platform-tools:$PATH";
 export PATH="$HOME/Library/Android/sdk/tools:$PATH";
