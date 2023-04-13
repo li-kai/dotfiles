@@ -53,11 +53,6 @@ if type _git &> /dev/null; then
 	complete -o default -o nospace -F _git g;
 fi;
 
-# Load zoxide if it is
-if ! command -v zoxide &> /dev/null; then
-	eval "$(zoxide init bash)"
-fi;
-
 # Add tab completion for many Bash commands
 if which brew &> /dev/null && [ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]; then
 	# Ensure existing Homebrew v1 completions continue to work
@@ -87,6 +82,11 @@ export NVM_DIR="${HOME}/.nvm";
 if ! command -v pnpm &> /dev/null; then
     corepack enable pnpm
     corepack prepare pnpm@latest --activate
+fi;
+
+# Load zoxide if it is
+if command -v zoxide &> /dev/null; then
+	eval "$(zoxide init bash)"
 fi;
 
 # use flutter
