@@ -167,5 +167,9 @@ function o() {
 # `less` with options to preserve color and line numbers, unless the output is
 # small enough for one screen.
 function tre() {
-	tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
+	if command -v exa >/dev/null 2>&1; then
+		ls -lahT --git --git-ignore --group-directories-first --ignore-glob='.git' "$@";
+	else
+		tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
+	fi;
 }
