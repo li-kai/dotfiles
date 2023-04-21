@@ -80,19 +80,10 @@ export NVM_DIR="${HOME}/.nvm";
 [ -s "$HOME/.cargo/env" ] && \. "$HOME/.cargo/env";
 
 if ! command -v pnpm &> /dev/null; then
-    corepack enable pnpm
-    corepack prepare pnpm@latest --activate
-
-fi;
-export PNPM_HOME="/Users/likai/Library/pnpm"
-case ":$PATH:" in
-	*":$PNPM_HOME:"*) ;;
-	*) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-
-# Load zoxide if it is
-if command -v zoxide &> /dev/null; then
-	eval "$(zoxide init bash)"
+	if command -v corepack &> /dev/null; then
+		corepack enable pnpm
+		corepack prepare pnpm@latest --activate
+	fi
 fi;
 
 # Load zoxide if it is
