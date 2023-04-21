@@ -35,6 +35,12 @@
 	# Amend the currently staged files to the latest commit.
 	amend = commit --amend --reuse-message=HEAD
 
+	# Edit last commit message
+	reword = commit --amend
+
+	# Undo last commit but keep changed files in stage
+	uncommit = reset --soft HEAD~1
+
 	# Credit an author on the latest commit.
 	credit = "!f() { git commit --amend --author \"$1 <$2>\" -C HEAD; }; f"
 
@@ -65,9 +71,6 @@
 
 	# Show the user email for the current repository.
 	whoami = config user.email
-
-	# List all aliases
-	aliases = config --get-regexp alias
 
 [apply]
 
@@ -134,8 +137,17 @@
 
 [diff]
 
+	# Use better, descriptive initials (c, i, w) instead of a/b.
+	# c: commit, i: index, w: working tree, o: object
+	mnemonicPrefix = true
 	# Detect copies as well as renames.
 	renames = copies
+	# When using --word-diff, assume --word-diff-regex=.
+	wordRegex = .
+	# Display submodule-related information (commit listings)
+	submodule = log
+	# Try to be smarter about whitespace changes.
+	indentHeuristic = true
 
 [diff "bin"]
 
@@ -149,15 +161,35 @@
 
 [merge]
 
+  # Autostash changes before rebasing
+  autoStash = true
+
 	# Include summaries of merged commits in newly created merge commit messages
 	log = true
+
+[rebase]
+
+  # Autostash changes before rebasing
+  autoStash = true
+  # e.g. Use 'p' instead of 'pick' when rebasing
+  abbreviateCommands = true
+
+[fetch]
+
+	# Always prune while fetching and pulling
+	prune = true
+	# Same thing with tags
+	pruneTags = true
+	# Fetch in parallel
+	parallel = 0
 
 [push]
 
 	# https://git-scm.com/docs/git-config#git-config-pushdefault
-	default = simple
+	default = current
 	# Make `git push` push relevant annotated tags when pushing branches out.
 	followTags = true
+	autoSetupRemote = true
 
 # URL shorthands
 
