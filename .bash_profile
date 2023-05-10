@@ -82,7 +82,13 @@ export NVM_DIR="${HOME}/.nvm";
 if ! command -v pnpm &> /dev/null; then
     corepack enable pnpm
     corepack prepare pnpm@latest --activate
+
 fi;
+export PNPM_HOME="/Users/likai/Library/pnpm"
+case ":$PATH:" in
+	*":$PNPM_HOME:"*) ;;
+	*) export PATH="$PNPM_HOME:$PATH" ;;
+esac
 
 # Load zoxide if it is
 if command -v zoxide &> /dev/null; then
@@ -93,3 +99,6 @@ fi;
 export PATH="$HOME/Library/Android/sdk/platform-tools:$PATH";
 export PATH="$HOME/Library/Android/sdk/tools:$PATH";
 export PATH="$HOME/repos/flutter/bin:$PATH";
+
+# use postgresql
+export PATH="/opt/homebrew/opt/postgresql@15/bin:$PATH"
