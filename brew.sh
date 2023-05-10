@@ -43,18 +43,21 @@ brew install git
 brew install git-lfs
 brew install gs
 brew install imagemagick
-brew install z
-brew install rectangle
+brew install zoxide
+brew install bat
+brew install exa
+brew install fzf
+brew install ripgrep
 
 brew tap homebrew/cask
 
-# brew cask install dropbox
 brew install --cask firefox
 brew install --cask google-chrome
 brew install --cask microsoft-edge
 brew install --cask vlc
 brew install --cask iterm2
 brew install --cask visual-studio-code
+brew install --cask rectangle
 
 # Remove outdated versions from the cellar.
 brew cleanup
