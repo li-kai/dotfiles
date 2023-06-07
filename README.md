@@ -8,32 +8,28 @@
 
 ### Using Git and the bootstrap script
 
-You can clone the repository wherever you want. (I like to keep it in `~/Projects/dotfiles`, with `~/dotfiles` as a symlink.) The bootstrapper script will pull in the latest version and copy the files to your home folder.
+You can clone the repository wherever you want. (I like to keep it in `~/repos/dotfiles`, with `~/dotfiles` as a symlink.) The bootstrapper script will pull in the latest version and copy the files to your home folder.
 
 ```bash
-git clone git@github.com:li-kai/dotfiles.git && cd dotfiles && source bootstrap.sh
+git clone git@github.com:li-kai/dotfiles.git && cd dotfiles && ./bootstrap.sh -l
 ```
 
 To update, `cd` into your local `dotfiles` repository and then:
 
 ```bash
-source bootstrap.sh
+./bootstrap.sh
 ```
 
 Alternatively, to update while avoiding the confirmation prompt:
 
 ```bash
-set -- -f; source bootstrap.sh
+./bootstrap.sh -f
 ```
 
 ### Link instead of copy files
 
-```$ bootstrap -l```
-
-or using ```source```
-
 ```bash
-set -- -l; source bootstrap.sh
+./bootstrap.sh -l
 ```
 
 ### Git-free install
