@@ -1,29 +1,56 @@
 #!/usr/bin/env bash
 OPTIND=1
 
-cd "$(dirname "${BASH_SOURCE}")";
+# Check if we are in the right directory
+cd "$(dirname "${BASH_SOURCE}")" || exit;
 
-git pull origin main;
+# Check if we have commited all changes
+if [[ $(git status --porcelain) ]]; then
+	echo "There are uncommited changes. Please commit or stash them before running this script."
+	exit 1
+fi
+
+# Check if we are root
+[ "$UID" -eq 0 ] || exec sudo bash "$0" "$@";
 
 function doIt() {
-	rsync --exclude ".git/" --exclude ".DS_Store" --exclude "*.sh" --exclude "*.md" --exclude "*.txt" \
-		-av --dry-run --no-perms . ~
+	rsync \
+		--exclude ".git/" \
+		--exclude ".DS_Store" \
+		--exclude "app_config/" \
+		--exclude "*.sh" \
+		--exclude "*.md" \
+		--exclude "*.txt" \
+		-av --no-perms . ~;
+	rsync --exclude ".DS_Store" -av --no-perms app_config/ ~/Library/Application\ Support/
 }
 function linkIt() {
-	FILES=$(find "$(pwd)" -not -path "*/.git/*" -not -name .git -not -name .DS_Store -not -name "*.sh" -not -name "*.md" -not -name "*.txt")
+	FILES=$(
+		find "$(pwd)" \
+			-maxdepth 1 -type f \
+			-not -path "*/.git/*" \
+			-not -name .git \
+			-not -name .DS_Store \
+			-not -name "app_config" \
+			-not -name "*.sh" \
+			-not -name "*.md" \
+			-not -name "*.txt" \
+		2> /dev/null
+	)
 	for file in $FILES; do
-		ln -sf ${file} ~/$(basename ${file})
+		ln -sf "${file}" "${HOME}/$(basename "${file}")"
 	done
+	# copy folders in app_config to /Library/Application Support
+	# because apps will overwrite the files in ~/Library/Application Support
+	rsync --exclude ".DS_Store" -av --no-perms app_config/ ~/Library/Application\ Support/
 }
 
 while getopts "fl" opt; do
 	case "$opt" in
-		f)
-			FORCE=1
-			;;
-		l)
-			LINK=1
-			;;
+		f) FORCE=1 ;;
+		l) LINK=1 ;;
+		*) echo "Usage: $0 [-f] [-l]" >&2
+			exit 1 ;;
 	esac
 done
 
@@ -34,7 +61,7 @@ if [ "$FORCE" == "1" ]; then
 		doIt
 	fi
 else
-	read -p "This may overwrite existing files in your home directory. Are you sure? (y/n) " -n 1
+	read -r -p "This may overwrite existing files in your home directory. Are you sure? (y/n) " -n 1
 	echo
 	if [[ $REPLY =~ ^[Yy]$ ]]; then
 		if [ "$LINK" == "1" ]; then
@@ -46,3 +73,4 @@ else
 fi
 source ~/.bash_profile
 unset doIt
+unset linkIt
