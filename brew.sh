@@ -51,13 +51,22 @@ brew install ripgrep
 
 brew tap homebrew/cask
 
+# Pro-tip: Never install electron apps, just use the web version.
+brew install --cask rectangle
 brew install --cask firefox
 brew install --cask google-chrome
 brew install --cask microsoft-edge
 brew install --cask vlc
-brew install --cask iterm2
+brew install --cask spotify
+
+# Install dev tools
 brew install --cask visual-studio-code
-brew install --cask rectangle
+brew install --cask docker
+brew install --cask iterm2
+
+# Install fonts
+brew tap homebrew/cask-fonts
+brew install font-inter
 
 # Remove outdated versions from the cellar.
 brew cleanup
