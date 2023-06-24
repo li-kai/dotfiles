@@ -14,6 +14,11 @@ fi
 [ "$UID" -eq 0 ] || exec sudo bash "$0" "$@";
 
 function linkIt() {
+	# Install oh-my-zsh
+	if [ ! -d "${HOME}/.oh-my-zsh" ]; then
+		sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+	fi
+
 	FILES=$(
 		find "$(pwd)" \
 			-maxdepth 1 -type f \
