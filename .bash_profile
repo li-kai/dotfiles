@@ -98,3 +98,6 @@ export PATH="$HOME/repos/flutter/bin:$PATH";
 
 # use postgresql
 export PATH="/opt/homebrew/opt/postgresql@15/bin:$PATH"
+
+# use llvm
+export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
