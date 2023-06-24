@@ -13,17 +13,6 @@ fi
 # Check if we are root
 [ "$UID" -eq 0 ] || exec sudo bash "$0" "$@";
 
-function doIt() {
-	rsync \
-		--exclude ".git/" \
-		--exclude ".DS_Store" \
-		--exclude "app_config/" \
-		--exclude "*.sh" \
-		--exclude "*.md" \
-		--exclude "*.txt" \
-		-av --no-perms . ~;
-	rsync --exclude ".DS_Store" -av --no-perms app_config/ ~/Library/Application\ Support/
-}
 function linkIt() {
 	FILES=$(
 		find "$(pwd)" \
@@ -48,29 +37,20 @@ function linkIt() {
 while getopts "fl" opt; do
 	case "$opt" in
 		f) FORCE=1 ;;
-		l) LINK=1 ;;
-		*) echo "Usage: $0 [-f] [-l]" >&2
+		*) echo "Usage: $0 [-f]" >&2
 			exit 1 ;;
 	esac
 done
 
 if [ "$FORCE" == "1" ]; then
-	if [ "$LINK" == "1" ]; then
-		linkIt
-	else
-		doIt
-	fi
+	linkIt
 else
 	read -r -p "This may overwrite existing files in your home directory. Are you sure? (y/n) " -n 1
 	echo
 	if [[ $REPLY =~ ^[Yy]$ ]]; then
-		if [ "$LINK" == "1" ]; then
-			linkIt
-		else
-			doIt
-		fi
+		linkIt
 	fi
 fi
+
 source ~/.bash_profile
-unset doIt
 unset linkIt
