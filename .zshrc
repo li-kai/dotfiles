@@ -1,17 +1,13 @@
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
-
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
-ZSH_THEME="robbyrussell"
+ZSH_CUSTOM=$HOME/.omz
+
+ZSH_THEME="geometry/geometry"
 
 # Uncomment the following line to use hyphen-insensitive completion.
 # Case-sensitive completion must be off. _ and - will be interchangeable.
 HYPHEN_INSENSITIVE="true"
-
-zstyle ':omz:update' mode auto      # update automatically without asking
-zstyle ':omz:update' frequency 11   # check for updates every 11 days
 
 # Uncomment the following line to enable command auto-correction.
 ENABLE_CORRECTION="true"
@@ -29,9 +25,6 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # see 'man strftime' for details.
 HIST_STAMPS="yyyy-mm-dd"
 
-# Point to ~/.omz
-ZSH_CUSTOM=$HOME/.omz
-
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
@@ -46,6 +39,11 @@ plugins=(
     zsh-syntax-highlighting
 )
 
+setopt globdots                        # include hidden files when globbing
+zstyle ':omz:update' mode auto         # update automatically without asking
+zstyle ':omz:update' frequency 11      # check for updates every 11 days
+zstyle ':omz:plugins:nvm' autoload yes # load nvm automatically
+
 source $ZSH/oh-my-zsh.sh
 
 # Load the shell dotfiles, and then some:
@@ -55,5 +53,3 @@ for file in ~/.{path,exports,aliases,functions,extra}; do
 	[ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
 unset file;
-
-zstyle ':omz:plugins:nvm' autoload yes

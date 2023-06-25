@@ -20,6 +20,7 @@ function linkIt() {
 		ZSH_CUSTOM="${HOME}/.omz"
 		git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting"
 		git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM}/plugins/zsh-autosuggestions"
+		git clone https://github.com/geometry-zsh/geometry "${ZSH_CUSTOM}/themes/geometry"
 	fi
 
 	# Symlink files and directories
