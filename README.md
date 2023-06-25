@@ -1,14 +1,20 @@
-# Li Kai's dotfiles (forked from Mathias’s dotfiles)
+# Kai's dotfiles
 
-![Screenshot of my shell prompt](https://i.imgur.com/EkEtphC.png)
+![Screenshot of my shell prompt](/assets/screenshot.png)
+
+## Overview
+
+This repository contains my personal dotfiles, forked from [Mathias Bynens](https://mathiasbynens.be/)' [dotfiles repository](https://github.com/mathiasbynens/dotfiles). Here's what differs from the original:
+
+- Zsh is used instead of Bash
+- `bootstrap.sh` symlinks instead of copying files
+- [Rectangle](https://github.com/rxhanson/Rectangle) is used instead of [Spectacle](https://www.spectacleapp.com/)
+- macOS defaults/aliases/functions are different
+- Rust cli alternatives (exa, bat, ripgrep, etc.) are preferred over GNU coreutils
 
 ## Installation
 
 **Warning:** If you want to give these dotfiles a try, you should first fork this repository, review the code, and remove things you don’t want or need. Don’t blindly use my settings unless you know what that entails. Use at your own risk!
-
-### Using Git and the bootstrap script
-
-You can clone the repository wherever you want. (I like to keep it in `~/repos/dotfiles`, with `~/dotfiles` as a symlink.) The bootstrapper script will pull in the latest version and copy the files to your home folder.
 
 ```sh
 git clone git@github.com:li-kai/dotfiles.git && cd dotfiles && ./bootstrap.sh
@@ -36,7 +42,7 @@ export PATH="/usr/local/bin:$PATH"
 
 If `~/.extra` exists, it will be sourced along with the other files. You can use this to add a few custom commands without the need to fork this entire repository, or to add commands you don’t want to commit to a public repository.
 
-My `~/.extra` looks something like this:
+Your `~/.extra` should look something like this:
 
 ```sh
 # Git credentials
@@ -64,7 +70,7 @@ When setting up a new Mac, you may want to set some sensible macOS defaults:
 When setting up a new Mac, you may want to install some common [Homebrew](https://brew.sh/) formulae (after installing Homebrew, of course):
 
 ```sh
-./brew.sh
+./.macos/brew.sh
 ```
 
 Some of the functionality of these dotfiles depends on formulae installed by `brew.sh`. If you don’t plan to run `brew.sh`, you should look carefully through the script and manually install any particularly important ones. A good example is Bash/Git completion: the dotfiles use a special version from Homebrew.
