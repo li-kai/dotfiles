@@ -101,3 +101,5 @@ export PATH="/opt/homebrew/opt/postgresql@15/bin:$PATH"
 
 # use llvm
 export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash

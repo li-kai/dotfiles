@@ -17,6 +17,9 @@ function linkIt() {
 	# Install oh-my-zsh
 	if [ ! -d "${HOME}/.oh-my-zsh" ]; then
 		sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+		ZSH_CUSTOM="${HOME}/.omz"
+		git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting"
+		git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM}/plugins/zsh-autosuggestions"
 	fi
 
 	# Symlink files and directories
