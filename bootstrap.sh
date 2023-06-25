@@ -61,5 +61,5 @@ else
 	fi
 fi
 
-source ~/.bash_profile
+source ~/.zshrc
 unset linkIt
