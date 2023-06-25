@@ -29,6 +29,7 @@ function linkIt() {
 		find "$(pwd)" \
 			-mindepth 1 \
 			-maxdepth 1 \
+			-not -name assets \
 			-not -name .macos \
 			-not -name .git \
 			-not -name .DS_Store \
