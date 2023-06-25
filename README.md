@@ -56,7 +56,7 @@ You could also use `~/.extra` to override settings, functions and aliases from m
 When setting up a new Mac, you may want to set some sensible macOS defaults:
 
 ```sh
-./.macos
+./.macos/settings.sh
 ```
 
 ### Install Homebrew formulae

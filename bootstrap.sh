@@ -10,8 +10,8 @@ if [[ $(git status --porcelain) ]]; then
 	exit 1
 fi
 
-# Check if we are root
-[ "$UID" -eq 0 ] || exec sudo bash "$0" "$@";
+# Ask for the administrator password upfront
+sudo -v
 
 function linkIt() {
 	# Install oh-my-zsh
@@ -19,24 +19,24 @@ function linkIt() {
 		sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 	fi
 
-	FILES=$(
+	# Symlink files and directories
+	local paths
+	paths=$(
 		find "$(pwd)" \
-			-maxdepth 1 -type f \
-			-not -path "*/.git/*" \
+			-mindepth 1 \
+			-maxdepth 1 \
+			-not -name .macos \
 			-not -name .git \
 			-not -name .DS_Store \
-			-not -name "app_config" \
 			-not -name "*.sh" \
 			-not -name "*.md" \
 			-not -name "*.txt" \
 		2> /dev/null
 	)
-	for file in $FILES; do
-		ln -sf "${file}" "${HOME}/$(basename "${file}")"
+	for path in $paths; do
+		relative_path=${path#"$(pwd)"/}
+		ln -sfv "$path" "$HOME/$relative_path"
 	done
-	# copy folders in app_config to /Library/Application Support
-	# because apps will overwrite the files in ~/Library/Application Support
-	rsync --exclude ".DS_Store" -av --no-perms app_config/ ~/Library/Application\ Support/
 }
 
 while getopts "fl" opt; do
