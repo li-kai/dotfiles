@@ -48,6 +48,7 @@ brew install bat
 brew install exa
 brew install fzf
 brew install ripgrep
+brew install direnv
 
 brew tap homebrew/cask
 
