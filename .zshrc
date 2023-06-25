@@ -1,3 +1,11 @@
+# Load the shell dotfiles, and then some:
+# * ~/.path can be used to extend `$PATH`.
+# * ~/.extra can be used for other settings you don’t want to commit.
+for file in ~/.{path,exports,aliases,functions,extra}; do
+	[ -r "$file" ] && [ -f "$file" ] && source "$file";
+done;
+unset file;
+
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
@@ -34,7 +42,6 @@ plugins=(
     fzf
     nvm
     rust
-    zoxide
     zsh-autosuggestions
     zsh-syntax-highlighting
 )
@@ -42,14 +49,9 @@ plugins=(
 setopt globdots                        # include hidden files when globbing
 zstyle ':omz:update' mode auto         # update automatically without asking
 zstyle ':omz:update' frequency 11      # check for updates every 11 days
-zstyle ':omz:plugins:nvm' autoload yes # load nvm automatically
+zstyle ':omz:plugins:nvm' lazy yes     # load nvm when calling `node`, etc.
 
 source $ZSH/oh-my-zsh.sh
 
-# Load the shell dotfiles, and then some:
-# * ~/.path can be used to extend `$PATH`.
-# * ~/.extra can be used for other settings you don’t want to commit.
-for file in ~/.{path,exports,aliases,functions,extra}; do
-	[ -r "$file" ] && [ -f "$file" ] && source "$file";
-done;
-unset file;
+eval "$(/opt/homebrew/bin/brew shellenv)"
+eval "$(zoxide init zsh)"
