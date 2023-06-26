@@ -25,7 +25,10 @@ function linkIt() {
 
 	# Symlink files and directories
 	local paths
-	paths=$(
+	paths=()
+	while read -r path; do
+		paths+=("$path")
+	done < <(
 		find "$(pwd)" \
 			-mindepth 1 \
 			-maxdepth 1 \
@@ -36,11 +39,15 @@ function linkIt() {
 			-not -name "*.sh" \
 			-not -name "*.md" \
 			-not -name "*.txt" \
-		2> /dev/null
+			2> /dev/null
 	)
-	for path in $paths; do
+	for path in "${paths[@]}"; do
 		relative_path=${path#"$(pwd)"/}
-		ln -sfv "$path" "$HOME/$relative_path"
+		source_path="$path"
+		if [ -d "$path" ]; then
+			source_path="$path/"
+		fi
+		ln -sfv "$source_path" "$HOME/$relative_path"
 	done
 }
 
@@ -62,5 +69,7 @@ else
 	fi
 fi
 
-source ~/.zshrc
+source ~/.bash_profile
 unset linkIt
+
+echo "Done. Reload your terminal to see the changes."
