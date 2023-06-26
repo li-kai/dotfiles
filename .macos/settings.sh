@@ -867,7 +867,10 @@ done
 # we don't symlink because apps will overwrite them
 rsync --dry-run --exclude ".DS_Store" -av --no-perms ./Application\ Support/ /Library/Application\ Support/
 
-FILES=$(
+files=()
+while read -r file; do
+	files+=("$file")
+done < <(
 	find "$(pwd)" \
 		-type f \
 		-not -name .DS_Store \
@@ -875,17 +878,17 @@ FILES=$(
 		-not -name "*.sh" \
 		-not -name "*.md" \
 		-not -name "*.txt" \
-	2> /dev/null
+		2> /dev/null
 )
 
 # Symlink files from .macos to $HOME
-IFS=$(echo -en "\n\b")
-for file in $FILES; do
-	# Remove .macos/ from the path
+for file in "${files[@]}"; do
+	# Remove "$(pwd)/" from the path
 	relative_path=${file#"$(pwd)"/}
+	# Make sure parent directory exists
+	mkdir -p "$HOME/$(dirname "$relative_path")"
 	ln -sfv "$file" "$HOME/$relative_path"
 done
-unset IFS
 
 ###############################################################################
 # Done                                                                        #
