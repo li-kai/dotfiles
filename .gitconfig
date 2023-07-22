@@ -1,10 +1,10 @@
 [alias]
 
 	# View abbreviated SHA, description, and history graph of the latest 20 commits.
-	l = log --pretty=oneline -n 20 --graph --abbrev-commit
+	l = !"git --no-pager log --pretty=oneline -n 20 --graph --abbrev-commit"
 
-	# View the current working tree status using the short format.
-	s = status -s
+	# Better git status
+	s = status --short --branch
 
 	# Show the diff between the latest commit and the current state.
 	d = !"git diff-index --quiet HEAD -- || clear; git --no-pager diff --patch-with-stat"
@@ -46,6 +46,9 @@
 
 	# Interactive rebase with the given number of latest commits.
 	reb = "!r() { git rebase -i HEAD~$1; }; r"
+
+	# Convenient wip commit
+	wip = "!git add -A && git commit -m \"Add WIP savepoint\""
 
 	# Remove the old tag with this name and tag the latest commit with it.
 	retag = "!r() { git tag -d $1 && git push origin :refs/tags/$1 && git tag $1; }; r"
@@ -148,6 +151,8 @@
 	submodule = log
 	# Try to be smarter about whitespace changes.
 	indentHeuristic = true
+	# Use the best diff algorithm by default.
+	algorithm = histogram
 
 [diff "bin"]
 
@@ -161,18 +166,17 @@
 
 [merge]
 
-  # Autostash changes before rebasing
-  autoStash = true
-
+	# Autostash changes before rebasing
+	autoStash = true
 	# Include summaries of merged commits in newly created merge commit messages
 	log = true
 
 [rebase]
 
-  # Autostash changes before rebasing
-  autoStash = true
-  # e.g. Use 'p' instead of 'pick' when rebasing
-  abbreviateCommands = true
+	# Autostash changes before rebasing
+	autoStash = true
+	# e.g. Use 'p' instead of 'pick' when rebasing
+	abbreviateCommands = true
 
 [fetch]
 
@@ -185,7 +189,7 @@
 
 [push]
 
-	# https://git-scm.com/docs/git-config#git-config-pushdefault
+	# https://git-scm.com/docs/git-config#Documentation/git-config.txt-pushdefault
 	default = current
 	# Make `git push` push relevant annotated tags when pushing branches out.
 	followTags = true
