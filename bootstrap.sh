@@ -69,6 +69,11 @@ else
 	fi
 fi
 
+echo "You should now download the following:"
+echo "Efficient Compression Tool (ect) - https://github.com/fhanau/Efficient-Compression-Tool/releases"
+echo "and move it by running the following command:"
+echo "sudo mv ~/Downloads/ect /usr/local/bin/"
+
 source ~/.bash_profile
 unset linkIt
 
