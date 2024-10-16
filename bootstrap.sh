@@ -33,7 +33,6 @@ function linkIt() {
 			-mindepth 1 \
 			-maxdepth 1 \
 			-not -name assets \
-			-not -name .macos \
 			-not -name .git \
 			-not -name .DS_Store \
 			-not -name "*.sh" \
@@ -43,11 +42,21 @@ function linkIt() {
 	)
 	for path in "${paths[@]}"; do
 		relative_path=${path#"$(pwd)"/}
-		source_path="$path"
-		if [ -d "$path" ]; then
-			source_path="$path/"
+		if [[ "$relative_path" == .macos ]]; then
+			# For .macos folder, symlink its contents directly to home
+			for item in "$path"/*; do
+				# Only symlink directories
+				if [ -d "$item" ]; then
+					ln -sfv "$item" "$HOME/$(basename "$item")"
+				fi
+			done
+		else
+			source_path="$path"
+			if [ -d "$path" ]; then
+				source_path="$path/"
+			fi
+			ln -sfv "$source_path" "$HOME/$relative_path"
 		fi
-		ln -sfv "$source_path" "$HOME/$relative_path"
 	done
 }
 
