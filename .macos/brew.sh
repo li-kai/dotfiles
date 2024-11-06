@@ -45,7 +45,7 @@ brew install gs
 brew install imagemagick
 brew install zoxide
 brew install bat
-brew install exa
+brew install eza
 brew install fzf
 brew install ripgrep
 brew install direnv

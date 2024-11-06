@@ -33,9 +33,9 @@ alias lsd="ls -lF ${colorflag} | grep --color=never '^d'"
 # shellcheck disable=SC2139
 alias ls="command ls ${colorflag}"
 
-# Replace `ls` and `tree` with `exa` if available
-if command -v exa >/dev/null 2>&1; then # `exa`
-	alias ls='exa -b --time-style=iso';
+# Replace `ls` and `tree` with `eza` if available
+if command -v eza >/dev/null 2>&1; then # `eza`
+	alias ls='eza -b --time-style=iso';
 	alias l='ls -lhF --git'
 	alias la='ls -lahF --git'
 	alias lsd='ls -lhF --git --only-dirs'
