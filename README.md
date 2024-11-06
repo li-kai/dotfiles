@@ -10,7 +10,7 @@ This repository contains my personal dotfiles, forked from [Mathias Bynens](http
 - `bootstrap.sh` symlinks instead of copying files
 - [Rectangle](https://github.com/rxhanson/Rectangle) is used instead of [Spectacle](https://www.spectacleapp.com/)
 - macOS defaults/aliases/functions are different
-- Rust cli alternatives (exa, bat, ripgrep, etc.) are preferred over GNU coreutils
+- Rust cli alternatives (eza, bat, ripgrep, etc.) are preferred over GNU coreutils
 
 ## Installation
 

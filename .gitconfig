@@ -224,6 +224,11 @@
 [user]
 	name = Li Kai
 	email = hello+github@lik.ai
+	signingkey = /Users/kai/.ssh/id_github.pub
 
 [pull]
 	ff = only
+	rebase = true
+
+[gpg]
+	format = ssh
