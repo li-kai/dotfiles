@@ -1,6 +1,17 @@
+# http://editorconfig.org
 root = true
 
 [*]
 charset = utf-8
 insert_final_newline = true
 trim_trailing_whitespace = true
+# Most files here are shell scripts, and heredocs are indented with tabs
+# which are sensitive to leading whitespace, so we use tabs for indentation.
+indent_style = tab
+indent_size = 2
+
+# Markdown syntax specifies that trailing whitespaces can be meaningful,
+# so let’s not trim those. e.g. 2 trailing spaces = linebreak (<br />)
+# See https://daringfireball.net/projects/markdown/syntax#p
+[*.md]
+trim_trailing_whitespace = false
