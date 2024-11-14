@@ -31,7 +31,6 @@ HIST_STAMPS="yyyy-mm-dd"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
     direnv
-    fzf
     nvm
     rust
     zsh-autosuggestions
@@ -48,6 +47,9 @@ unset plugins;
 
 eval "$(/opt/homebrew/bin/brew shellenv)" # enable brew
 eval "$(zoxide init zsh)"                 # enable zoxide
+export FZF_DEFAULT_COMMAND="rg"
+export FZF_DEFAULT_OPTS="--height 40% --tmux bottom,40% --layout=reverse"
+FZF_ALT_C_COMMAND= source <(fzf --zsh)    # enable fzf
 
 # Load the shell dotfiles, and then some:
 # * ~/.path can be used to extend `$PATH`.
