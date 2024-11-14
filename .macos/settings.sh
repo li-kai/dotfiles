@@ -3,14 +3,18 @@
 # ~/.macos — https://mths.be/macos
 
 # Check if we are in the right directory
-cd "$(dirname "${BASH_SOURCE}")" || exit;
+cd "$(dirname "${BASH_SOURCE[0]}")" || exit;
 
 # Ask for the administrator password upfront
 sudo -v
 
 # Close any open System Preferences panes, to prevent them from overriding
 # settings we’re about to change
-osascript -e 'tell application "System Preferences" to quit'
+# Close any open System Preferences panes, to prevent them from overriding settings we’re about to change
+osascript -e 'tell application "System Preferences" to quit' || {
+    echo "Failed to close System Preferences"
+    exit 1
+}
 
 # Keep-alive: update existing `sudo` time stamp until this script has finished
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
