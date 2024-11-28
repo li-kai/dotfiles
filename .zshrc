@@ -58,3 +58,18 @@ for file in ~/.{path,exports,aliases,functions,extra}; do
 	[ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
 unset file;
+
+if command -v uv &> /dev/null; then
+	# License: CC0
+	# https://github.com/astral-sh/uv/issues/8432#issuecomment-2453494736
+	eval "$(uv generate-shell-completion zsh)"
+
+	_uv_run_mod() {
+			if [[ "$words[2]" == "run" && "$words[CURRENT]" != -* ]]; then
+					_arguments '*:filename:_files'
+			else
+					_uv "$@"
+			fi
+	}
+	compdef _uv_run_mod uv
+fi
