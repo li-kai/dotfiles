@@ -2,6 +2,12 @@
 
 # Install command-line tools using Homebrew.
 
+# Check if Homebrew is installed
+if ! command -v brew &> /dev/null; then
+    echo "Homebrew is not installed. Please install it from https://brew.sh/"
+    exit 1
+fi
+
 # Make sure we’re using the latest Homebrew.
 brew update
 
@@ -26,44 +32,64 @@ brew install gnu-sed
 brew install bash
 brew install bash-completion2
 
-# Switch to using brew-installed bash as default shell
-if ! grep -F -q "${BREW_PREFIX}/bin/bash" /etc/shells; then
-  echo "${BREW_PREFIX}/bin/bash" | sudo tee -a /etc/shells;
-  chsh -s "${BREW_PREFIX}/bin/bash";
-fi;
-
 # Install `wget`
 brew install wget
 
 # Install more recent versions of some macOS tools.
 brew install vim
 
-# Install other useful binaries.
+# Development Tools
 brew install git
 brew install git-lfs
-brew install gs
-brew install imagemagick
+brew install gnupg
+brew install direnv
+brew install vim
+brew install tmux
+brew install htop
+brew install tree
+brew install jq
+brew install yq
+brew install uv
+
+# CLI Improvements
 brew install zoxide
 brew install bat
 brew install eza
 brew install fzf
 brew install ripgrep
-brew install direnv
 
-brew tap homebrew/cask
+# Image Processing
+brew install gs
+brew install imagemagick
 
-# Pro-tip: Never install electron apps, just use the web version.
-brew install --cask rectangle
+# Applications
+## Pro-tip: Never install electron apps, just use the web version.
+
+## Browsers
 brew install --cask firefox
+brew install --cask firefox@developer-edition
 brew install --cask google-chrome
 brew install --cask microsoft-edge
+
+## Productivity
+brew install --cask rectangle
+brew install --cask raycast
+brew install --cask obsidian
+brew install --cask bitwarden
+brew install --cask shottr
+brew install --cask screen-studio
+
+## Media
 brew install --cask vlc
 brew install --cask spotify
 
-# Install dev tools
+## Development
 brew install --cask visual-studio-code
 brew install --cask docker
 brew install --cask iterm2
+brew install --cask cursor
+brew install --cask zed
+brew install --cask ollama
 
 # Remove outdated versions from the cellar.
 brew cleanup
