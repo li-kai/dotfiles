@@ -79,6 +79,9 @@ brew install --cask bitwarden
 brew install --cask shottr
 brew install --cask screen-studio
 
+# Mouse Improvements
+brew install --cask sanesidebuttons
+
 ## Media
 brew install --cask vlc
 brew install --cask spotify
