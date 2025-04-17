@@ -59,6 +59,11 @@ for file in ~/.{path,exports,aliases,functions,extra}; do
 done;
 unset file;
 
+# Load Nix environment if available
+if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+  . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+fi
+
 if command -v uv &> /dev/null; then
 	# License: CC0
 	# https://github.com/astral-sh/uv/issues/8432#issuecomment-2453494736
