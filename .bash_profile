@@ -91,15 +91,20 @@ if command -v zoxide &> /dev/null; then
 	eval "$(zoxide init bash)"
 fi;
 
-# use flutter
-export PATH="$HOME/Library/Android/sdk/platform-tools:$PATH";
-export PATH="$HOME/Library/Android/sdk/tools:$PATH";
-export PATH="$HOME/repos/flutter/bin:$PATH";
+# use flutter if it is installed
+if [ -d "$HOME/repos/flutter/bin" ]; then
+	export PATH="$HOME/Library/Android/sdk/platform-tools:$PATH";
+	export PATH="$HOME/Library/Android/sdk/tools:$PATH";
+	export PATH="$HOME/repos/flutter/bin:$PATH";
+fi
 
 # use postgresql
 export PATH="/opt/homebrew/opt/postgresql@15/bin:$PATH"
 
 # use llvm
 export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
+
+# use homebrew curl
+export PATH="/opt/homebrew/opt/curl/bin:$PATH"
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash

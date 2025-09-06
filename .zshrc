@@ -3,7 +3,12 @@ export ZSH="$HOME/.oh-my-zsh"
 
 ZSH_CUSTOM=$HOME/.omz
 
-ZSH_THEME="geometry/geometry"
+# Set theme conditionally - use minimal prompt in Cursor to avoid command detection issues
+if [[ "$TERM_PROGRAM" == "vscode" ]]; then
+  ZSH_THEME=""  # Disable complex theme for Cursor
+else
+  ZSH_THEME="geometry/geometry"
+fi
 
 # Uncomment the following line to use hyphen-insensitive completion.
 # Case-sensitive completion must be off. _ and - will be interchangeable.
@@ -45,6 +50,12 @@ zstyle ':omz:plugins:nvm' lazy yes     # load nvm when calling `node`, etc.
 source $ZSH/oh-my-zsh.sh;
 unset plugins;
 
+# Use a minimal prompt in Cursor to avoid command detection issues
+if [[ "$TERM_PROGRAM" == "vscode" ]]; then
+  PROMPT='%n@%m:%~%# '
+  RPROMPT=''
+fi
+
 eval "$(/opt/homebrew/bin/brew shellenv)" # enable brew
 eval "$(zoxide init zsh)"                 # enable zoxide
 export FZF_DEFAULT_COMMAND="rg"
@@ -78,3 +89,10 @@ if command -v uv &> /dev/null; then
 	}
 	compdef _uv_run_mod uv
 fi
+
+# use homebrew curl
+export PATH="/opt/homebrew/opt/curl/bin:$PATH"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/kai/.lmstudio/bin"
+# End of LM Studio CLI section
