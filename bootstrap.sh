@@ -47,7 +47,15 @@ function linkIt() {
 			for item in "$path"/*; do
 				# Only symlink directories
 				if [ -d "$item" ]; then
-					ln -sfv "$item" "$HOME/$(basename "$item")"
+					target_name="$(basename "$item")"
+					target_path="$HOME/$target_name"
+
+					# Remove existing symlink or directory if it exists
+					if [ -L "$target_path" ] || [ -e "$target_path" ]; then
+						rm -rf "$target_path"
+					fi
+
+					ln -sfv "$item" "$target_path"
 				fi
 			done
 		else
@@ -55,7 +63,14 @@ function linkIt() {
 			if [ -d "$path" ]; then
 				source_path="$path/"
 			fi
-			ln -sfv "$source_path" "$HOME/$relative_path"
+			target_path="$HOME/$relative_path"
+
+			# Remove existing symlink or file if it exists
+			if [ -L "$target_path" ] || [ -e "$target_path" ]; then
+				rm -rf "$target_path"
+			fi
+
+			ln -sfv "$source_path" "$target_path"
 		fi
 	done
 }
