@@ -17,11 +17,10 @@ function linkIt() {
 	# Install oh-my-zsh
 	if [ ! -d "${HOME}/.oh-my-zsh" ]; then
 		sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-		ZSH_CUSTOM="${HOME}/.omz"
-		git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting"
-		git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM}/plugins/zsh-autosuggestions"
-		git clone https://github.com/geometry-zsh/geometry "${ZSH_CUSTOM}/themes/geometry"
 	fi
+
+	# Initialize and update git submodules for oh-my-zsh customizations
+	git submodule update --init --recursive
 
 	# Symlink files and directories
 	local paths
@@ -91,10 +90,13 @@ function linkIt() {
 	done
 }
 
-while getopts "fl" opt; do
+while getopts "f" opt; do
 	case "$opt" in
 		f) FORCE=1 ;;
 		*) echo "Usage: $0 [-f]" >&2
+			echo "  -f    Force installation without confirmation" >&2
+			echo "" >&2
+			echo "For updating dotfiles and submodules, use: ./update.sh" >&2
 			exit 1 ;;
 	esac
 done

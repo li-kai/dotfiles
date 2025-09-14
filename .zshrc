@@ -1,7 +1,7 @@
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
-ZSH_CUSTOM=$HOME/.omz
+ZSH_CUSTOM=$HOME/.config/oh-my-zsh
 
 # Set theme conditionally - use minimal prompt in Cursor to avoid command detection issues
 if [[ "$TERM_PROGRAM" == "vscode" ]]; then

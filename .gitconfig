@@ -85,6 +85,11 @@
 	# Show most recently changed branches first.
 	sort = -committerdate
 
+[submodule]
+
+	# Automatically initialize and update submodules when cloning or pulling.
+	recurse = true
+
 [core]
 
 	# Use custom `.gitignore` and `.gitattributes`.
