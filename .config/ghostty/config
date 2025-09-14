@@ -1,0 +1,23 @@
+# Ghostty Configuration - Minimal Customization
+# Only essential non-default settings from your iTerm2
+
+# =============================================================================
+# COLOR SCHEME OVERRIDE
+# =============================================================================
+# Default: Built-in default theme
+# Your preference: Oceanic-Next (matches your iTerm2)
+theme = "oceanic-next"
+
+# =============================================================================
+# SCROLLBACK OVERRIDE
+# =============================================================================
+# Default: Limited scrollback (~10,000 lines)
+# Your preference: Unlimited scrollback (from your iTerm2)
+scrollback-limit = 0
+
+# =============================================================================
+# WORKING DIRECTORY OVERRIDE
+# =============================================================================
+# Default: Current directory
+# Your preference: /Users/kai (from your iTerm2)
+working-directory = "/Users/kai"

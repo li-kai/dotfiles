@@ -58,6 +58,22 @@ function linkIt() {
 					ln -sfv "$item" "$target_path"
 				fi
 			done
+		elif [[ "$relative_path" == .config ]]; then
+			# For .config folder, symlink its contents to ~/.config/
+			for item in "$path"/*; do
+				# Only symlink directories
+				if [ -d "$item" ]; then
+					target_name="$(basename "$item")"
+					target_path="$HOME/.config/$target_name"
+
+					# Remove existing symlink or directory if it exists
+					if [ -L "$target_path" ] || [ -e "$target_path" ]; then
+						rm -rf "$target_path"
+					fi
+
+					ln -sfv "$item" "$target_path"
+				fi
+			done
 		else
 			source_path="$path"
 			if [ -d "$path" ]; then
