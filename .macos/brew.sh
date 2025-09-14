@@ -57,6 +57,7 @@ brew install bat
 brew install eza
 brew install fzf
 brew install ripgrep
+brew install tldr
 
 # Image Processing
 brew install gs
@@ -92,7 +93,6 @@ brew install --cask docker
 brew install --cask iterm2
 brew install --cask cursor
 brew install --cask zed
-brew install --cask ollama
 
 # Remove outdated versions from the cellar.
 brew cleanup

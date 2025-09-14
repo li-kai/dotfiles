@@ -135,3 +135,6 @@ alias reload="exec ${SHELL} -l"
 alias path='echo -e ${PATH//:/\\n}'
 
 alias python='python3'
+
+# Replace confusing man pages with practical examples
+alias man='tldr'
