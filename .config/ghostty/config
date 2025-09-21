@@ -4,20 +4,13 @@
 # =============================================================================
 # COLOR SCHEME OVERRIDE
 # =============================================================================
-# Default: Built-in default theme
-# Your preference: Oceanic-Next (matches your iTerm2)
-theme = "oceanic-next"
+theme = "Oceanic Next"
 
 # =============================================================================
 # SCROLLBACK OVERRIDE
 # =============================================================================
 # Default: Limited scrollback (~10,000 lines)
-# Your preference: Unlimited scrollback (from your iTerm2)
-scrollback-limit = 0
+# Your preference: Unlimited scrollback (but not supported by Ghostty)
+scrollback-limit = 50000
 
-# =============================================================================
-# WORKING DIRECTORY OVERRIDE
-# =============================================================================
-# Default: Current directory
-# Your preference: /Users/kai (from your iTerm2)
 working-directory = "/Users/kai"
