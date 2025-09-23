@@ -50,6 +50,7 @@ brew install tree
 brew install jq
 brew install yq
 brew install uv
+brew install fnm
 
 # CLI Improvements
 brew install zoxide

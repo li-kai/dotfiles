@@ -36,7 +36,6 @@ HIST_STAMPS="yyyy-mm-dd"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
     direnv
-    nvm
     rust
     zsh-autosuggestions
     zsh-syntax-highlighting
@@ -45,10 +44,28 @@ plugins=(
 setopt globdots                        # include hidden files when globbing
 zstyle ':omz:update' mode auto         # update automatically without asking
 zstyle ':omz:update' frequency 11      # check for updates every 11 days
-zstyle ':omz:plugins:nvm' lazy yes     # load nvm when calling `node`, etc.
+eval "$(/opt/homebrew/bin/brew shellenv)" # enable brew before enabling plugins
 
 source $ZSH/oh-my-zsh.sh;
 unset plugins;
+
+# FNM (Fast Node Manager) configuration
+eval "$(fnm env --shell zsh)"
+
+# Auto-switch Node.js versions based on .nvmrc or .node-version files
+autoload -U add-zsh-hook
+load-nvmrc() {
+  # Skip if direnv is active and handling the environment
+  if [[ -n "$DIRENV_DIR" ]]; then
+    return
+  fi
+
+  if [[ -f .nvmrc || -f .node-version ]]; then
+    fnm use
+  fi
+}
+add-zsh-hook chpwd load-nvmrc
+load-nvmrc
 
 # Use a minimal prompt in Cursor to avoid command detection issues
 if [[ "$TERM_PROGRAM" == "vscode" ]]; then
@@ -56,7 +73,6 @@ if [[ "$TERM_PROGRAM" == "vscode" ]]; then
   RPROMPT=''
 fi
 
-eval "$(/opt/homebrew/bin/brew shellenv)" # enable brew
 eval "$(zoxide init zsh)"                 # enable zoxide
 export FZF_DEFAULT_COMMAND="rg"
 export FZF_DEFAULT_OPTS="--height 40% --tmux bottom,40% --layout=reverse"
@@ -87,7 +103,12 @@ if command -v uv &> /dev/null; then
 					_uv "$@"
 			fi
 	}
-	compdef _uv_run_mod uv
+		# Ensure completion system is initialized before defining custom compdefs
+		if ! (( ${+_comps} )); then
+			autoload -Uz compinit
+			compinit
+		fi
+		compdef _uv_run_mod uv
 fi
 
 # use homebrew curl
