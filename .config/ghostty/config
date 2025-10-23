@@ -14,3 +14,4 @@ theme = "Oceanic Next"
 scrollback-limit = 50000
 
 working-directory = "/Users/kai"
+keybind = shift+enter=text:\x1b\r
