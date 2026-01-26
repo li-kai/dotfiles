@@ -5,7 +5,7 @@
 add_newline = true
 continuation_prompt = "[▸▹ ](dimmed white)"
 
-format = """($nix_shell$container$fill$git_metrics\n)$cmd_duration\
+format = """($nix_shell$container${custom.tip}$fill$git_metrics\n)$cmd_duration\
 $hostname\
 $localip\
 $shlvl\
@@ -331,3 +331,11 @@ unknown_msg = '[◌](bold dimmed yellow)'
 [spack]
 symbol = "◇ "
 format = " spack [$symbol$environment]($style)"
+
+[custom.tip]
+command = 'source ~/.functions && _shell_tip'
+when = '[ $((RANDOM % 20)) -eq 0 ]'
+shell = ['zsh', '-c']
+use_stdin = false
+format = '[$output ]($style)'
+style = 'italic dimmed white'
