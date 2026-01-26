@@ -1,53 +1,45 @@
-# Path to your oh-my-zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
+# Initialize Homebrew
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
-ZSH_CUSTOM=$HOME/.config/oh-my-zsh
+# Native zsh completion setup
+autoload -Uz compinit
+compinit
 
-# Set theme conditionally - use minimal prompt in Cursor to avoid command detection issues
-if [[ "$TERM_PROGRAM" == "vscode" ]]; then
-  ZSH_THEME=""  # Disable complex theme for Cursor
-else
-  ZSH_THEME="geometry/geometry"
-fi
+# Completion settings
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z-_}={A-Za-z_-}' 'r:|=*' 'l:|=* r:|=*'  # Case/hyphen insensitive
+zstyle ':completion:*' menu select                      # Tab through completions
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}" # Colored completions
+zstyle ':completion:*' special-dirs true                # Complete . and ..
+zstyle ':completion:*' squeeze-slashes true             # Treat // as /
+zstyle ':completion:*' group-name ''                    # Group completions by category
+zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'  # Category headers
+LISTMAX=0                                               # Show all completions without asking
 
-# Uncomment the following line to use hyphen-insensitive completion.
-# Case-sensitive completion must be off. _ and - will be interchangeable.
-HYPHEN_INSENSITIVE="true"
+setopt AUTO_CD              # Type directory name to cd into it
+setopt AUTO_PUSHD           # cd pushes onto directory stack
+setopt PUSHD_IGNORE_DUPS    # No duplicates in directory stack
+setopt PUSHD_SILENT         # Don't print stack after pushd/popd
 
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# You can set one of the optional three formats:
-# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# or set a custom format using the strftime function format specifications,
-# see 'man strftime' for details.
+# History configuration
+HISTSIZE=50000
+SAVEHIST=50000
+HISTFILE=~/.zsh_history
 HIST_STAMPS="yyyy-mm-dd"
+setopt EXTENDED_HISTORY          # Write timestamps to history
+setopt HIST_EXPIRE_DUPS_FIRST    # Expire duplicates first when trimming history
+setopt HIST_IGNORE_DUPS          # Don't record duplicates
+setopt HIST_IGNORE_SPACE         # Don't record entries starting with space
+setopt HIST_VERIFY               # Show command before executing from history
+setopt SHARE_HISTORY             # Share history between sessions
 
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(
-    direnv
-    rust
-    zsh-autosuggestions
-    zsh-syntax-highlighting
-)
+setopt globdots                  # Include hidden files when globbing
 
-setopt globdots                        # include hidden files when globbing
-zstyle ':omz:update' mode auto         # update automatically without asking
-zstyle ':omz:update' frequency 11      # check for updates every 11 days
-eval "$(/opt/homebrew/bin/brew shellenv)" # enable brew before enabling plugins
+# Load plugins from ~/.config/zsh/plugins/
+source ~/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source ~/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
-source $ZSH/oh-my-zsh.sh;
-unset plugins;
+# Direnv integration
+eval "$(direnv hook zsh)"
 
 # FNM (Fast Node Manager) configuration
 eval "$(fnm env --shell zsh)"
@@ -67,11 +59,11 @@ load-nvmrc() {
 add-zsh-hook chpwd load-nvmrc
 load-nvmrc
 
-# Use a minimal prompt in Cursor to avoid command detection issues
-if [[ "$TERM_PROGRAM" == "vscode" ]]; then
-  PROMPT='%n@%m:%~%# '
-  RPROMPT=''
-fi
+eval "$(starship init zsh)"
+function set_win_title(){
+    echo -ne "\033]0; $(basename "$PWD") \007"
+}
+starship_precmd_user_func="set_win_title"
 
 eval "$(zoxide init zsh)"                 # enable zoxide
 export FZF_DEFAULT_COMMAND="rg"
@@ -80,7 +72,7 @@ FZF_ALT_C_COMMAND= source <(fzf --zsh)    # enable fzf
 
 # Load the shell dotfiles, and then some:
 # * ~/.path can be used to extend `$PATH`.
-# * ~/.extra can be used for other settings you don’t want to commit.
+# * ~/.extra can be used for other settings you don't want to commit.
 for file in ~/.{path,exports,aliases,functions,extra}; do
 	[ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
@@ -103,17 +95,12 @@ if command -v uv &> /dev/null; then
 					_uv "$@"
 			fi
 	}
-		# Ensure completion system is initialized before defining custom compdefs
-		if ! (( ${+_comps} )); then
-			autoload -Uz compinit
-			compinit
-		fi
 		compdef _uv_run_mod uv
 fi
 
-# use homebrew curl
+# use homebrew curl and grep
 export PATH="/opt/homebrew/opt/curl/bin:$PATH"
+export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
 
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/kai/.lmstudio/bin"
 # End of LM Studio CLI section
+export PATH="$HOME/.local/bin:$PATH"

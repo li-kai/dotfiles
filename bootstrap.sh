@@ -14,12 +14,12 @@ fi
 sudo -v
 
 function linkIt() {
-	# Install oh-my-zsh
-	if [ ! -d "${HOME}/.oh-my-zsh" ]; then
-		sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+	# Install starship prompt if not already installed
+	if ! command -v starship &> /dev/null; then
+		brew install starship
 	fi
 
-	# Initialize and update git submodules for oh-my-zsh customizations
+	# Initialize and update git submodules for zsh plugins
 	git submodule update --init --recursive
 
 	# Symlink files and directories
@@ -60,18 +60,20 @@ function linkIt() {
 		elif [[ "$relative_path" == .config ]]; then
 			# For .config folder, symlink its contents to ~/.config/
 			for item in "$path"/*; do
-				# Only symlink directories
+				target_name="$(basename "$item")"
+				target_path="$HOME/.config/$target_name"
+
+				source_path="$item"
 				if [ -d "$item" ]; then
-					target_name="$(basename "$item")"
-					target_path="$HOME/.config/$target_name"
-
-					# Remove existing symlink or directory if it exists
-					if [ -L "$target_path" ] || [ -e "$target_path" ]; then
-						rm -rf "$target_path"
-					fi
-
-					ln -sfv "$item" "$target_path"
+					source_path="$item/"
 				fi
+
+				# Remove existing symlink or file/directory if it exists
+				if [ -L "$target_path" ] || [ -e "$target_path" ]; then
+					rm -rf "$target_path"
+				fi
+
+				ln -sfv "$source_path" "$target_path"
 			done
 		else
 			source_path="$path"
