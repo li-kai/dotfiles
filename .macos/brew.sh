@@ -58,7 +58,7 @@ brew install bat
 brew install eza
 brew install fzf
 brew install ripgrep
-brew install tldr
+brew install grep
 
 # Image Processing
 brew install gs
