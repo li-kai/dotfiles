@@ -46,6 +46,10 @@ if command -v bat >/dev/null 2>&1; then
 	alias cat='bat'
 fi
 
+# Clipboard (macOS)
+alias copy='pbcopy'
+alias paste='pbpaste'
+
 # Enable aliases to be sudo’ed
 alias sudo='sudo '
 
@@ -99,3 +103,8 @@ alias nvm='fnm'
 
 ## ports - show listening ports
 alias ports='lsof -i -P -n | grep LISTEN'
+
+## isotime - get ISO 8601 timestamp
+alias isotime='date -u +"%Y-%m-%dT%H:%M:%SZ"'
+
+alias timestamp='epoch'
