@@ -91,7 +91,7 @@ brew install --cask spotify
 ## Development
 brew install --cask visual-studio-code
 brew install --cask docker
-brew install --cask iterm2
+brew install --cask ghostty
 brew install --cask cursor
 brew install --cask zed
 
