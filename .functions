@@ -1,18 +1,67 @@
 #!/usr/bin/env bash
 
-# Create a new directory and enter it
+## mkd foo/bar - create directory and cd into it
 function mkd() {
+	# shellcheck disable=SC2164
 	mkdir -p "$@" && cd "$_";
 }
 
-# Change working directory to the top-most Finder window location
-function cdf() { # short for `cdfinder`
+## cdf - cd to the current Finder window
+function cdf() {
+	# shellcheck disable=SC2164
 	cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
 }
 
-# Create a .tar.gz archive, using `zopfli`, `pigz` or `gzip` for compression
+# Normalize `open` across Linux, macOS, and Windows.
+if [[ $OSTYPE != darwin* ]]; then
+	if grep -q Microsoft /proc/version 2>/dev/null; then
+		alias open='explorer.exe';
+	else
+		alias open='xdg-open';
+	fi
+fi
+
+## o [file] - open file or current dir in Finder
+function o() {
+	if [ $# -eq 0 ]; then
+		open .;
+	else
+		open "$@";
+	fi;
+}
+
+## tre [path] - tree view with git awareness
+function tre() {
+	if command -v eza >/dev/null 2>&1; then
+		eza -lahT --git --git-ignore --group-directories-first --ignore-glob='.git' "$@";
+	else
+		tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
+	fi;
+}
+
+
+## fs [file|dir] - show size of file or directory
+function fs() {
+	if du -b /dev/null > /dev/null 2>&1; then
+		local arg=-sbh;
+	else
+		local arg=-sh;
+	fi
+	if [[ -n "$*" ]]; then
+		du $arg -- "$@";
+	else
+		du $arg .[^.]* ./*;
+	fi;
+}
+
+## duh [path] - sorted directory sizes
+function duh() {
+	du -h -d 1 "$@" | sort -h;
+}
+
+## targz files... - create .tar.gz archive
 function targz() {
-	local tmpFile="${@%/}.tar";
+	local tmpFile="${*%/}.tar";
 	tar -cvf "${tmpFile}" --exclude=".DS_Store" "${@}" || return 1;
 
 	size=$(
@@ -22,7 +71,6 @@ function targz() {
 
 	local cmd="";
 	if (( size < 52428800 )) && hash zopfli 2> /dev/null; then
-		# the .tar file is smaller than 50 MB and Zopfli is available; use it
 		cmd="zopfli";
 	else
 		if hash pigz 2> /dev/null; then
@@ -44,30 +92,21 @@ function targz() {
 	echo "${tmpFile}.gz ($((zippedSize / 1000)) kB) created successfully.";
 }
 
-# Determine size of a file or total size of a directory
-function fs() {
-	if du -b /dev/null > /dev/null 2>&1; then
-		local arg=-sbh;
-	else
-		local arg=-sh;
-	fi
-	if [[ -n "$@" ]]; then
-		du $arg -- "$@";
-	else
-		du $arg .[^.]* ./*;
-	fi;
+## gz file - compare original vs gzipped size
+function gz() {
+	# shellcheck disable=SC2155
+	local origsize=$(wc -c < "$1");
+	# shellcheck disable=SC2155
+	local gzipsize=$(gzip -c "$1" | wc -c);
+	# shellcheck disable=SC2155
+	local ratio=$(echo "$gzipsize * 100 / $origsize" | bc -l);
+	printf "orig: %d bytes\n" "$origsize";
+	printf "gzip: %d bytes (%2.2f%%)\n" "$gzipsize" "$ratio";
 }
 
-# Use Git’s colored diff when available
-hash git &>/dev/null;
-if [ $? -eq 0 ]; then
-	function diff() {
-		git diff --no-index --color-words "$@";
-	}
-fi;
-
-# Create a data URL from a file
+## dataurl file - create base64 data URL
 function dataurl() {
+	# shellcheck disable=SC2155
 	local mimeType=$(file -b --mime-type "$1");
 	if [[ $mimeType == text/* ]]; then
 		mimeType="${mimeType};charset=utf-8";
@@ -75,40 +114,29 @@ function dataurl() {
 	echo "data:${mimeType};base64,$(openssl base64 -in "$1" | tr -d '\n')";
 }
 
-# Start an HTTP server from a directory, optionally specifying a folder, and port
+## server [dir] [port] - start HTTP server (default: . on 8000)
 function server() {
-    # Test if it is a valid directory
-    if [ -d "$1" ]; then
-        local dir="$1"
-        local port="${2:-8000}"
-    elif [[ "$1" =~ "^[0-9]+$" ]]; then
-        local port="$1"
-        local dir="."
-    else
-        echo "Invalid directory"
-        return
-    fi
+	if [ -d "$1" ]; then
+		local dir="$1"
+		local port="${2:-8000}"
+	elif [[ "$1" =~ ^[0-9]+$ ]]; then
+		local port="$1"
+		local dir="."
+	else
+		echo "Invalid directory"
+		return
+	fi
 
-    echo "Serving $dir on http://localhost:$port"
-    python3 -m http.server "$port" --directory "$dir"
+	echo "Serving $dir on http://localhost:$port"
+	python3 -m http.server "$port" --directory "$dir"
 }
 
-# Compare original and gzipped file size
-function gz() {
-	local origsize=$(wc -c < "$1");
-	local gzipsize=$(gzip -c "$1" | wc -c);
-	local ratio=$(echo "$gzipsize * 100 / $origsize" | bc -l);
-	printf "orig: %d bytes\n" "$origsize";
-	printf "gzip: %d bytes (%2.2f%%)\n" "$gzipsize" "$ratio";
-}
-
-# Run `dig` and display the most useful info
+## digga example.com - DNS lookup with all records
 function digga() {
 	dig +nocmd "$1" any +multiline +noall +answer;
 }
 
-# Show all the names (CNs and SANs) listed in the SSL certificate
-# for a given domain
+## getcertnames domain - show SSL certificate names (CN and SANs)
 function getcertnames() {
 	if [ -z "${1}" ]; then
 		echo "ERROR: No domain specified.";
@@ -117,21 +145,23 @@ function getcertnames() {
 
 	local domain="${1}";
 	echo "Testing ${domain}…";
-	echo ""; # newline
+	echo "";
 
+	# shellcheck disable=SC2155
 	local tmp=$(echo -e "GET / HTTP/1.0\nEOT" \
 		| openssl s_client -connect "${domain}:443" -servername "${domain}" 2>&1);
 
 	if [[ "${tmp}" = *"-----BEGIN CERTIFICATE-----"* ]]; then
+		# shellcheck disable=SC2155
 		local certText=$(echo "${tmp}" \
 			| openssl x509 -text -certopt "no_aux, no_header, no_issuer, no_pubkey, \
 			no_serial, no_sigdump, no_signame, no_validity, no_version");
 		echo "Common Name:";
-		echo ""; # newline
+		echo "";
 		echo "${certText}" | grep "Subject:" | sed -e "s/^.*CN=//" | sed -e "s/\/emailAddress=.*//";
-		echo ""; # newline
+		echo "";
 		echo "Subject Alternative Name(s):";
-		echo ""; # newline
+		echo "";
 		echo "${certText}" | grep -A 1 "Subject Alternative Name:" \
 			| sed -e "2s/DNS://g" -e "s/ //g" | tr "," "\n" | tail -n +2;
 		return 0;
@@ -141,35 +171,103 @@ function getcertnames() {
 	fi;
 }
 
-# Normalize `open` across Linux, macOS, and Windows.
-# This is needed to make the `o` function (see below) cross-platform.
-if [ ! $(uname -s) = 'Darwin' ]; then
-	if grep -q Microsoft /proc/version; then
-		# Ubuntu on Windows using the Linux subsystem
-		alias open='explorer.exe';
-	else
-		alias open='xdg-open';
+## killport 3000 - kill process on a port
+function killport() {
+	local pids=$(lsof -ti:"$1" 2>/dev/null)
+	if [[ -z "$pids" ]]; then
+		echo "No process on port $1"
+		return 1
 	fi
-fi
-
-# `o` with no arguments opens the current directory, otherwise opens the given
-# location
-function o() {
-	if [ $# -eq 0 ]; then
-		open .;
-	else
-		open "$@";
-	fi;
+	echo "$pids" | xargs kill -9 && echo "Killed process(es) on port $1"
 }
 
-# `tre` is a shorthand for `tree` with hidden files and color enabled, ignoring
-# the `.git` directory, listing directories first. The output gets piped into
-# `less` with options to preserve color and line numbers, unless the output is
-# small enough for one screen.
-function tre() {
-	if command -v eza >/dev/null 2>&1; then
-		ls -lahT --git --git-ignore --group-directories-first --ignore-glob='.git' "$@";
-	else
-		tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
-	fi;
+## fkill - fuzzy search and kill processes
+function fkill() {
+	ps aux | fzf --header-lines=1 --multi | awk '{print $2}' | xargs kill -9
+}
+
+# Use Git's colored diff when available
+if hash git &>/dev/null; then
+	function diff() {
+		git diff --no-index --color-words "$@";
+	}
+fi
+
+## gb - fuzzy switch git branch
+function gb() {
+	local branch=$(git branch -a --sort=-committerdate --format='%(refname:short)' | fzf --preview 'git log --oneline -20 {}')
+	[[ -n "$branch" ]] && git checkout "${branch#origin/}"
+}
+
+## gclean [-r] - delete merged branches (-r includes remote)
+function gclean() {
+	local remote=false
+	[[ "$1" == "-r" ]] && remote=true
+
+	git fetch --prune
+
+	# shellcheck disable=SC2155
+	local branches=$(git branch --merged | grep -vE '^\*|^\s*(main|master|develop)$')
+
+	if [[ -z "$branches" ]]; then
+		echo "No merged branches to delete"
+		return 0
+	fi
+
+	echo "Deleting merged branches:"
+	# shellcheck disable=SC2001
+	echo "$branches" | sed 's/^/  /'
+
+	echo "$branches" | xargs git branch -d
+
+	if $remote; then
+		echo "Deleting from remote..."
+		echo "$branches" | xargs -I {} git push origin --delete {} 2>/dev/null
+	fi
+}
+
+## fquick - fuzzy search all aliases and functions
+# shellcheck disable=SC2016,SC2086,SC2296
+function fquick() {
+	{
+		builtin alias | sed 's/^/[alias] /'
+		print -l ${(k)functions} | sed 's/^/[func]  /'
+	} | fzf --preview 'word=$(echo {} | awk "{print \$2}" | cut -d= -f1); type $word 2>/dev/null || builtin alias $word 2>/dev/null'
+}
+
+## falias - fuzzy search aliases, copy to clipboard
+function falias() {
+	builtin alias | fzf --preview 'echo {}' | cut -d= -f1 | tr -d "\n" | pbcopy
+}
+
+# Show a random alias or function tip (only ones with ## comments)
+function _shell_tip() {
+	local -a tips
+	local comment=""
+
+	# Parse aliases (only ## comments)
+	while IFS= read -r line; do
+		if [[ $line == \#\#* ]]; then
+			comment="${line#\#\# }"
+		elif [[ $line == alias\ * && -n $comment ]]; then
+			tips+=("$comment")
+			comment=""
+		else
+			[[ -n $line ]] && comment=""
+		fi
+	done < ~/.aliases
+
+	# Parse functions (only ## comments)
+	while IFS= read -r line; do
+		if [[ $line == \#\#* ]]; then
+			comment="${line#\#\# }"
+		elif [[ $line == function\ * && -n $comment ]]; then
+			tips+=("$comment")
+			comment=""
+		else
+			[[ -n $line ]] && comment=""
+		fi
+	done < ~/.functions
+
+	(( ${#tips[@]} )) && print "Tip: ${tips[RANDOM % ${#tips[@]} + 1]}"
 }
