@@ -1,5 +1,6 @@
 # Ignore
 .extra
+.gitconfig.local
 
 # Compiled Python files
 *.pyc

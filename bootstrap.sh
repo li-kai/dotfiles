@@ -113,10 +113,20 @@ else
 	fi
 fi
 
-echo "You should now download the following:"
-echo "Efficient Compression Tool (ect) - https://github.com/fhanau/Efficient-Compression-Tool/releases"
-echo "and move it by running the following command:"
-echo "sudo mv ~/Downloads/ect /usr/local/bin/"
+echo ""
+echo "Post-install steps:"
+echo ""
+echo "1. Edit .gitconfig.local in the dotfiles repo with your personal git settings:"
+echo "   [user]"
+echo "       name = Your Name"
+echo "       email = your@email.com"
+echo "       signingkey = /path/to/your/key.pub"
+echo "   (This file is gitignored and symlinked to ~/.gitconfig.local)"
+echo ""
+echo "2. Download Efficient Compression Tool (ect):"
+echo "   https://github.com/fhanau/Efficient-Compression-Tool/releases"
+echo "   sudo mv ~/Downloads/ect /usr/local/bin/"
+echo ""
 
 source ~/.bash_profile
 unset linkIt

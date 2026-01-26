@@ -75,6 +75,29 @@
 	# Show the user email for the current repository.
 	whoami = config user.email
 
+	# Fuzzy switch to a branch.
+	sw = "!git branch -a --sort=-committerdate --format='%(refname:short)' | fzf --preview 'git log --oneline -20 {}' | sed 's#^origin/##' | xargs -I {} git switch {}"
+
+	# Clean up merged branches (both regular and squash-merged).
+	superprune = "!f() { \
+		echo 'Fetching and pruning...'; \
+		git fetch --prune; \
+		echo ''; \
+		echo 'Deleting merged local branches...'; \
+		git branch --merged | grep -vE '^\\*|^\\s*(main|master|develop|staging)$' | xargs -r git branch -d; \
+		echo ''; \
+		echo 'Deleting branches with deleted upstream (squash-merged)...'; \
+		git branch -vv | grep ': gone]' | grep -vE '^\\*|^\\s*(main|master|develop|staging)\\s' | awk '{print $1}' | xargs -r git branch -D; \
+		echo ''; \
+		echo 'Done!'; \
+	}; f"
+
+	# Alias for superprune.
+	clean = "!git superprune"
+
+	# Safer force push (use --force-with-lease + --force-if-includes).
+	pushf = push --force-with-lease --force-if-includes
+
 [apply]
 
 	# Detect whitespace errors when applying a patch.
@@ -182,6 +205,20 @@
 	autoStash = true
 	# e.g. Use 'p' instead of 'pick' when rebasing
 	abbreviateCommands = true
+	# Automatically arrange fixup!/squash! commits in interactive rebase
+	autoSquash = true
+
+[rerere]
+
+	# Reuse Recorded Resolution - remember how you resolved merge conflicts
+	enabled = true
+	# Automatically stage files after rerere resolves conflicts
+	autoupdate = true
+
+[column]
+
+	# Better formatting for branch/tag lists
+	ui = auto
 
 [fetch]
 
@@ -191,6 +228,8 @@
 	pruneTags = true
 	# Fetch in parallel
 	parallel = 0
+	# Write commit-graph on fetch for faster git log
+	writeCommitGraph = true
 
 [push]
 
@@ -226,14 +265,14 @@
 
 	defaultBranch = main
 
-[user]
-	name = Li Kai
-	email = hello+github@lik.ai
-	signingkey = /Users/kai/.ssh/id_github.pub
-
 [pull]
 	ff = only
 	rebase = true
 
 [gpg]
 	format = ssh
+
+[include]
+
+	# Machine-specific config (user, signing key, maintenance) - not committed
+	path = ~/.gitconfig.local

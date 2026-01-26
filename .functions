@@ -193,39 +193,6 @@ if hash git &>/dev/null; then
 	}
 fi
 
-## gb - fuzzy switch git branch
-function gb() {
-	local branch=$(git branch -a --sort=-committerdate --format='%(refname:short)' | fzf --preview 'git log --oneline -20 {}')
-	[[ -n "$branch" ]] && git checkout "${branch#origin/}"
-}
-
-## gclean [-r] - delete merged branches (-r includes remote)
-function gclean() {
-	local remote=false
-	[[ "$1" == "-r" ]] && remote=true
-
-	git fetch --prune
-
-	# shellcheck disable=SC2155
-	local branches=$(git branch --merged | grep -vE '^\*|^\s*(main|master|develop)$')
-
-	if [[ -z "$branches" ]]; then
-		echo "No merged branches to delete"
-		return 0
-	fi
-
-	echo "Deleting merged branches:"
-	# shellcheck disable=SC2001
-	echo "$branches" | sed 's/^/  /'
-
-	echo "$branches" | xargs git branch -d
-
-	if $remote; then
-		echo "Deleting from remote..."
-		echo "$branches" | xargs -I {} git push origin --delete {} 2>/dev/null
-	fi
-}
-
 ## fquick - fuzzy search all aliases and functions
 # shellcheck disable=SC2016,SC2086,SC2296
 function fquick() {
