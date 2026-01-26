@@ -1,9 +1,25 @@
 # Initialize Homebrew
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
-# Native zsh completion setup
+# Additional PATH entries (before tools that depend on them)
+export PATH="/opt/homebrew/opt/curl/bin:$PATH"
+export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
+export PATH="/opt/homebrew/opt/grep/libexec/gnubin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+
+# Use emacs keybindings
+bindkey -e
+
+# Load completion system
 autoload -Uz compinit
-compinit
+
+if [[ -n $(print ~/.zcompdump(Nmh+24)) ]] {
+  # Regenerate completions because the dump file hasn't been modified within the last 24 hours
+  compinit
+} else {
+  # Reuse the existing completions file
+  compinit -C
+}
 
 # Completion settings
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z-_}={A-Za-z_-}' 'r:|=*' 'l:|=* r:|=*'  # Case/hyphen insensitive
@@ -24,13 +40,14 @@ setopt PUSHD_SILENT         # Don't print stack after pushd/popd
 HISTSIZE=50000
 SAVEHIST=50000
 HISTFILE=~/.zsh_history
-HIST_STAMPS="yyyy-mm-dd"
 setopt EXTENDED_HISTORY          # Write timestamps to history
 setopt HIST_EXPIRE_DUPS_FIRST    # Expire duplicates first when trimming history
-setopt HIST_IGNORE_DUPS          # Don't record duplicates
+setopt HIST_IGNORE_ALL_DUPS      # Remove older duplicate when new one is added
 setopt HIST_IGNORE_SPACE         # Don't record entries starting with space
 setopt HIST_VERIFY               # Show command before executing from history
 setopt SHARE_HISTORY             # Share history between sessions
+setopt HIST_FIND_NO_DUPS         # Don't show dupes when searching history
+setopt HIST_REDUCE_BLANKS        # Remove extra whitespace from history entries
 
 setopt globdots                  # Include hidden files when globbing
 
@@ -61,7 +78,7 @@ load-nvmrc
 
 eval "$(starship init zsh)"
 function set_win_title(){
-    echo -ne "\033]0; $(basename "$PWD") \007"
+    echo -ne "\033]0; ${PWD:t} \007"
 }
 starship_precmd_user_func="set_win_title"
 
@@ -86,7 +103,11 @@ fi
 if command -v uv &> /dev/null; then
 	# License: CC0
 	# https://github.com/astral-sh/uv/issues/8432#issuecomment-2453494736
-	eval "$(uv generate-shell-completion zsh)"
+	_uv_cache="${XDG_CACHE_HOME:-$HOME/.cache}/uv_completions.zsh"
+	if [[ ! -f "$_uv_cache" || "$(command -v uv)" -nt "$_uv_cache" ]]; then
+		uv generate-shell-completion zsh > "$_uv_cache"
+	fi
+	source "$_uv_cache"
 
 	_uv_run_mod() {
 			if [[ "$words[2]" == "run" && "$words[CURRENT]" != -* ]]; then
@@ -95,12 +116,5 @@ if command -v uv &> /dev/null; then
 					_uv "$@"
 			fi
 	}
-		compdef _uv_run_mod uv
+	compdef _uv_run_mod uv
 fi
-
-# use homebrew curl and grep
-export PATH="/opt/homebrew/opt/curl/bin:$PATH"
-export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
-
-# End of LM Studio CLI section
-export PATH="$HOME/.local/bin:$PATH"
