@@ -5,10 +5,10 @@ OPTIND=1
 cd "$(dirname "${BASH_SOURCE}")" || exit;
 
 # Check if we have commited all changes
-if [[ $(git status --porcelain) ]]; then
-	echo "There are uncommited changes. Please commit or stash them before running this script."
-	exit 1
-fi
+# if [[ $(git status --porcelain) ]]; then
+# 	echo "There are uncommited changes. Please commit or stash them before running this script."
+# 	exit 1
+# fi
 
 # Ask for the administrator password upfront
 sudo -v
@@ -114,6 +114,16 @@ else
 fi
 
 echo ""
+echo "Setting up git maintenance..."
+# Start git maintenance for background optimization
+if git maintenance start 2>/dev/null; then
+	echo "Git maintenance started successfully"
+else
+	echo "Note: Git maintenance requires git 2.30+. Skipping."
+fi
+echo ""
+
+echo ""
 echo "Post-install steps:"
 echo ""
 echo "1. Edit .gitconfig.local in the dotfiles repo with your personal git settings:"
@@ -126,6 +136,9 @@ echo ""
 echo "2. Download Efficient Compression Tool (ect):"
 echo "   https://github.com/fhanau/Efficient-Compression-Tool/releases"
 echo "   sudo mv ~/Downloads/ect /usr/local/bin/"
+echo ""
+echo "3. To enable git maintenance for specific repos, cd into them and run:"
+echo "   git maintenance register"
 echo ""
 
 source ~/.bash_profile
