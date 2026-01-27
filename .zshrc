@@ -31,6 +31,13 @@ zstyle ':completion:*' group-name ''                    # Group completions by c
 zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'  # Category headers
 LISTMAX=0                                               # Show all completions without asking
 
+# Enhanced completions
+zstyle ':completion:*' completer _complete _approximate
+zstyle ':completion:*:approximate:*' max-errors 2 numeric
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
+zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+
 setopt AUTO_CD              # Type directory name to cd into it
 setopt AUTO_PUSHD           # cd pushes onto directory stack
 setopt PUSHD_IGNORE_DUPS    # No duplicates in directory stack
@@ -45,15 +52,29 @@ setopt HIST_EXPIRE_DUPS_FIRST    # Expire duplicates first when trimming history
 setopt HIST_IGNORE_ALL_DUPS      # Remove older duplicate when new one is added
 setopt HIST_IGNORE_SPACE         # Don't record entries starting with space
 setopt HIST_VERIFY               # Show command before executing from history
-setopt SHARE_HISTORY             # Share history between sessions
+setopt INC_APPEND_HISTORY        # Append immediately to file
+setopt HIST_FCNTL_LOCK           # Better locking for concurrent access
 setopt HIST_FIND_NO_DUPS         # Don't show dupes when searching history
 setopt HIST_REDUCE_BLANKS        # Remove extra whitespace from history entries
 
 setopt globdots                  # Include hidden files when globbing
+setopt EXTENDED_GLOB             # Extended globbing: ^ ~ # operators
+setopt CORRECT                   # Suggest corrections for typos
+SPROMPT='zsh: correct %F{red}%R%f to %F{green}%r%f? [n]o [y]es [a]bort [e]dit: '
+
+# Word handling - Ctrl+W stops at path separators
+WORDCHARS='*?[]~&;!#$%^(){}<>'
+autoload -Uz select-word-style && select-word-style bash
 
 # Load plugins from ~/.config/zsh/plugins/
+source ~/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh
 source ~/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source ~/.config/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.plugin.zsh
 source ~/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# History substring search - standard mode only
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
 
 # Direnv integration
 eval "$(direnv hook zsh)"
@@ -76,6 +97,37 @@ load-nvmrc() {
 add-zsh-hook chpwd load-nvmrc
 load-nvmrc
 
+# Auto-activate Python venv
+auto_venv() {
+  if [[ -n "$VIRTUAL_ENV" ]] && [[ ! "$PWD" == "${VIRTUAL_ENV%/*}"* ]]; then
+    deactivate 2>/dev/null
+  fi
+  if [[ -z "$VIRTUAL_ENV" ]]; then
+    if [[ -f .venv/bin/activate ]]; then
+      source .venv/bin/activate
+    elif [[ -f venv/bin/activate ]]; then
+      source venv/bin/activate
+    fi
+  fi
+}
+add-zsh-hook chpwd auto_venv
+
+# Background git fetch on cd into repo (smart throttling)
+auto_git_fetch() {
+  if git rev-parse --is-inside-work-tree &>/dev/null; then
+    local fetch_head=".git/FETCH_HEAD"
+    # Only fetch if FETCH_HEAD doesn't exist or is older than 60 minutes
+    if [[ ! -f "$fetch_head" ]] || [[ -n $(find "$fetch_head" -mmin +60 2>/dev/null) ]]; then
+      (git fetch --quiet &)
+    fi
+  fi
+}
+add-zsh-hook chpwd auto_git_fetch
+
+# Use minimal prompt in vscode/cursor integrated terminal
+if [[ "$TERM_PROGRAM" == "vscode" || "$TERM_PROGRAM" == "cursor" ]]; then
+  export STARSHIP_CONFIG="$HOME/.config/starship-minimal.toml"
+fi
 eval "$(starship init zsh)"
 function set_win_title(){
     echo -ne "\033]0; ${PWD:t} \007"
