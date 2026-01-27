@@ -274,6 +274,20 @@ function timeago() {
 	((diff < 0)) && echo "$result in the future" || echo "$result ago"
 }
 
+## dsh - docker shell into running container with fzf
+function dsh() {
+	docker exec -it "$(docker ps --format '{{.Names}}' | fzf)" sh;
+}
+
+# rm files... - move to Trash instead of deleting (use \rm for real delete)
+rm() {
+  local trash="$HOME/.Trash"
+  for f in "$@"; do
+    [[ "$f" == -* ]] && continue
+    [[ -e "$f" ]] && mv "$f" "$trash/$(basename "$f")_$(date +%s)"
+  done
+}
+
 # Show a random alias or function tip (only ones with ## comments)
 # shellcheck disable=SC2053
 function _shell_tip() {
