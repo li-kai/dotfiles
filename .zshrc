@@ -85,8 +85,8 @@ eval "$(fnm env --shell zsh)"
 # Auto-switch Node.js versions based on .nvmrc or .node-version files
 autoload -U add-zsh-hook
 load-nvmrc() {
-  # Skip if direnv is active and handling the environment
-  if [[ -n "$DIRENV_DIR" ]]; then
+  # Skip if direnv is active or will handle the environment (via .envrc or flake.nix)
+  if [[ -n "$DIRENV_DIR" ]] || [[ -f .envrc ]] || [[ -f flake.nix ]]; then
     return
   fi
 
@@ -170,3 +170,8 @@ if command -v uv &> /dev/null; then
 	}
 	compdef _uv_run_mod uv
 fi
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/kai/.lmstudio/bin"
+# End of LM Studio CLI section
+

@@ -98,6 +98,9 @@
 	# Safer force push (use --force-with-lease + --force-if-includes).
 	pushf = push --force-with-lease --force-if-includes
 
+	# Claude worktree
+	cwt = !sh -c \"git worktree add \\\"\\$1\\\" \\\"\\${2:-main}\\\" && mkdir -p \\\"\\$1/.claude\\\" && ln -sf \\\"\\$(git   \n  rev-parse --show-toplevel)/.claude/settings.local.json\\\" \\\"\\$1/.claude/settings.local.json\\\"\" -
+
 [apply]
 
 	# Detect whitespace errors when applying a patch.
