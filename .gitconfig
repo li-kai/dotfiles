@@ -99,7 +99,14 @@
 	pushf = push --force-with-lease --force-if-includes
 
 	# Claude worktree
-	cwt = !sh -c \"git worktree add \\\"\\$1\\\" \\\"\\${2:-main}\\\" && mkdir -p \\\"\\$1/.claude\\\" && ln -sf \\\"\\$(git   \n  rev-parse --show-toplevel)/.claude/settings.local.json\\\" \\\"\\$1/.claude/settings.local.json\\\"\" -
+	cwt = "!f() { \
+		toplevel=\"$(git rev-parse --show-toplevel)\" && \
+		dest=\"$toplevel/../$1\" && \
+		(git worktree add \"$dest\" \"$1\" 2>/dev/null || git worktree add -b \"$1\" \"$dest\" \"${2:-HEAD}\") && \
+		mkdir -p \"$dest/.claude\" && \
+		ln -sf \"$toplevel/.claude/settings.local.json\" \"$dest/.claude/settings.local.json\" && \
+		echo \"Worktree ready. Run:\\n  cd $dest\"; \
+	}; f"
 
 [apply]
 
