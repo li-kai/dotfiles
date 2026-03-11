@@ -295,7 +295,7 @@ function _shell_tip() {
 	local files=(~/.aliases ~/.functions)
 	local patterns=("alias *" "function *")
 
-	for i in {0..1}; do
+	for i in {1..2}; do
 		local comment=""
 		while IFS= read -r line; do
 			if [[ $line == \#\#* ]]; then
