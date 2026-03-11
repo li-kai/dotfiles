@@ -1,17 +1,6 @@
-# Ghostty Configuration - Minimal Customization
-# Only essential non-default settings from your iTerm2
+# Ghostty Configuration
 
-# =============================================================================
-# COLOR SCHEME OVERRIDE
-# =============================================================================
-theme = "Oceanic Next"
-
-# =============================================================================
-# SCROLLBACK OVERRIDE
-# =============================================================================
-# Default: Limited scrollback (~10,000 lines)
-# Your preference: Unlimited scrollback (but not supported by Ghostty)
-scrollback-limit = 50000
-
-working-directory = "/Users/kai"
+theme = Material Theme Default
+scrollback-limit = 262144
+notify-on-command-finish = unfocused
 keybind = shift+enter=text:\x1b\r
