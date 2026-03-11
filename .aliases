@@ -9,7 +9,7 @@ alias ~="cd ~" # `cd` is probably faster to type though
 alias -- -="cd -"
 
 # Shortcuts
-alias cc="claude"
+alias cc="claude --disallowedTools \"EnterPlanMode,ExitPlanMode,EnterWorktree,NotebookEdit\""
 alias dl="cd ~/Downloads"
 alias dt="cd ~/Desktop"
 alias g="git"
