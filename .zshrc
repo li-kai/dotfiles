@@ -80,7 +80,10 @@ bindkey '^[[B' history-substring-search-down
 eval "$(direnv hook zsh)"
 
 # FNM (Fast Node Manager) configuration
-eval "$(fnm env --shell zsh)"
+# Skip fnm initialization inside nix-shell (nix sets TMPDIR to a path containing "nix-shell")
+if [[ "$TMPDIR" != *nix-shell* ]]; then
+  eval "$(fnm env --shell zsh)"
+fi
 
 # Auto-switch Node.js versions based on .nvmrc or .node-version files
 autoload -U add-zsh-hook
