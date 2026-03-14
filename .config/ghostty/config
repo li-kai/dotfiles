@@ -4,3 +4,10 @@ theme = Material Theme Default
 scrollback-limit = 262144
 notify-on-command-finish = unfocused
 keybind = shift+enter=text:\x1b\r
+selection-clear-on-typing = true
+copy-on-select = true
+split-inherit-working-directory = true
+tab-inherit-working-directory = true
+split-preserve-zoom = navigation
+window-colorspace = display-p3
+macos-titlebar-style = tabs
