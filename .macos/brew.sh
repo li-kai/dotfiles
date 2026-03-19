@@ -75,7 +75,6 @@ brew install --cask microsoft-edge
 
 ## Productivity
 brew install --cask rectangle
-brew install --cask raycast
 brew install --cask obsidian
 brew install --cask bitwarden
 brew install --cask shottr
