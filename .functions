@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# Shared shell functions. Zsh is the primary interactive shell; keep non-interactive helpers portable.
 
 ## mkd foo/bar - create directory and cd into it
 function mkd() {
@@ -6,38 +6,40 @@ function mkd() {
 	mkdir -p "$@" && cd "$_";
 }
 
-## cdf - cd to the current Finder window
-function cdf() {
-	# shellcheck disable=SC2164
-	cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
-}
+if [[ $- == *i* ]]; then
+	## cdf - cd to the current Finder window
+	function cdf() {
+		# shellcheck disable=SC2164
+		cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
+	}
 
-# Normalize `open` across Linux, macOS, and Windows.
-if [[ $OSTYPE != darwin* ]]; then
-	if grep -q Microsoft /proc/version 2>/dev/null; then
-		alias open='explorer.exe';
-	else
-		alias open='xdg-open';
+	# Normalize `open` across Linux, macOS, and Windows.
+	if [[ $OSTYPE != darwin* ]]; then
+		if grep -q Microsoft /proc/version 2>/dev/null; then
+			alias open='explorer.exe';
+		else
+			alias open='xdg-open';
+		fi
 	fi
+
+	## o [file] - open file or current dir in Finder
+	function o() {
+		if [ $# -eq 0 ]; then
+			open .;
+		else
+			open "$@";
+		fi;
+	}
+
+	## tre [path] - tree view with git awareness
+	function tre() {
+		if command -v eza >/dev/null 2>&1; then
+			eza -lahT --git --git-ignore --group-directories-first --ignore-glob='.git' "$@";
+		else
+			tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
+		fi;
+	}
 fi
-
-## o [file] - open file or current dir in Finder
-function o() {
-	if [ $# -eq 0 ]; then
-		open .;
-	else
-		open "$@";
-	fi;
-}
-
-## tre [path] - tree view with git awareness
-function tre() {
-	if command -v eza >/dev/null 2>&1; then
-		eza -lahT --git --git-ignore --group-directories-first --ignore-glob='.git' "$@";
-	else
-		tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
-	fi;
-}
 
 ## fs [file|dir] - show size of file or directory
 function fs() {
@@ -109,47 +111,84 @@ function dataurl() {
 	echo "data:${mimeType};base64,$(openssl base64 -in "$1" | tr -d '\n')";
 }
 
-## serve [-cors] [dir] [port] - start HTTP server (default: . on 8000)
+## serve [-cors] [--public|--host host] [dir] [port] - start HTTP server (default: 127.0.0.1:. on 8000)
 function serve() {
+	local usage="Usage: serve [-cors] [--public|--host host] [dir] [port]"
 	local cors=false
-	local args=()
+	local host="127.0.0.1"
+	local dir="."
+	local port=8000
+	local url_host
 
-	# Parse arguments for -cors flag
-	for arg in "$@"; do
-		if [[ "$arg" == "-cors" ]]; then
-			cors=true
-		else
-			args+=("$arg")
-		fi
+	while (( $# )); do
+		case "$1" in
+			-cors|--cors)
+				cors=true
+				;;
+			--public)
+				host="0.0.0.0"
+				;;
+			--host)
+				shift
+				[[ -n "${1:-}" ]] || { echo "$usage"; return 1; }
+				host="$1"
+				;;
+			--help|-h)
+				echo "$usage"
+				return 0
+				;;
+			*)
+				if [[ -d "$1" && "$dir" == "." ]]; then
+					dir="$1"
+				elif [[ "$1" =~ ^[0-9]+$ && "$port" == "8000" ]]; then
+					port="$1"
+				else
+					echo "$usage"; return 1
+				fi
+				;;
+		esac
+		shift
 	done
 
-	# Parse directory and port from remaining args
-	local dir="." port=8000
-	if [[ -d "${args[0]:-}" ]]; then
-		dir="${args[0]}" port="${args[1]:-8000}"
-	elif [[ "${args[0]:-}" =~ ^[0-9]+$ ]]; then
-		port="${args[0]}"
-	elif [[ -n "${args[0]:-}" ]]; then
-		echo "Invalid directory" && return 1
-	fi
+	[[ -d "$dir" ]] || {
+		echo "Directory not found: $dir"
+		return 1
+	}
+
+	[[ "$port" =~ ^[0-9]+$ ]] && (( port >= 1 && port <= 65535 )) || {
+		echo "Port must be between 1 and 65535"
+		return 1
+	}
+
+	url_host="$host"
+	[[ "$host" == "0.0.0.0" ]] && url_host="localhost"
 
 	if $cors; then
-		echo "Serving $dir on http://localhost:$port (with CORS)"
-		python3 -c "
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+		echo "Serving $dir on http://$url_host:$port (bound to $host, with CORS)"
+		SERVE_DIR="$dir" SERVE_HOST="$host" SERVE_PORT="$port" python3 - <<'PY'
 import os
-os.chdir('$dir')
+from functools import partial
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+
+directory = os.environ["SERVE_DIR"]
+host = os.environ["SERVE_HOST"]
+port = int(os.environ["SERVE_PORT"])
+
+
 class CORSRequestHandler(SimpleHTTPRequestHandler):
     def end_headers(self):
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', '*')
-        self.send_header('Access-Control-Allow-Headers', '*')
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "*")
+        self.send_header("Access-Control-Allow-Headers", "*")
         super().end_headers()
-HTTPServer(('', $port), CORSRequestHandler).serve_forever()
-"
+
+
+handler = partial(CORSRequestHandler, directory=directory)
+ThreadingHTTPServer((host, port), handler).serve_forever()
+PY
 	else
-		echo "Serving $dir on http://localhost:$port"
-		python3 -m http.server "$port" --directory "$dir"
+		echo "Serving $dir on http://$url_host:$port (bound to $host)"
+		python3 -m http.server "$port" --bind "$host" --directory "$dir"
 	fi
 }
 
@@ -182,38 +221,151 @@ function getcertnames() {
 		| sed -e "2s/DNS://g" -e "s/ //g" | tr "," "\n" | tail -n +2
 }
 
-## killport 3000 - kill process on a port
+_kill_wait_seconds() {
+	local wait_seconds="${1:-3}"
+	[[ "$wait_seconds" =~ ^[1-5]$ ]] || {
+		echo "Wait time must be an integer from 1 to 5 seconds" >&2
+		return 1
+	}
+	printf '%s\n' "$wait_seconds"
+}
+
+_print_processes() {
+	(( $# )) || return 0
+	local -a ps_args=()
+	local pid
+
+	for pid in "$@"; do
+		ps_args+=(-p "$pid")
+	done
+
+	ps -o pid=,command= "${ps_args[@]}" 2>/dev/null || printf '  pid %s\n' "$@"
+}
+
+_kill_with_timeout() {
+	local wait_seconds="$1"
+	shift
+
+	local -a pids=("$@")
+	local -a alive=()
+	local pid elapsed
+
+	(( ${#pids[@]} )) || return 1
+
+	printf 'Sending SIGTERM to %s process(es)...\n' "${#pids[@]}"
+	kill "${pids[@]}" 2>/dev/null || true
+
+	for (( elapsed = 0; elapsed < wait_seconds; elapsed++ )); do
+		alive=()
+		for pid in "${pids[@]}"; do
+			kill -0 "$pid" 2>/dev/null && alive+=("$pid")
+		done
+
+		(( ${#alive[@]} == 0 )) && {
+			printf 'Stopped cleanly within %ss.\n' "$wait_seconds"
+			return 0
+		}
+
+		sleep 1
+	done
+
+	alive=()
+	for pid in "${pids[@]}"; do
+		kill -0 "$pid" 2>/dev/null && alive+=("$pid")
+	done
+
+	if (( ${#alive[@]} )); then
+		printf 'Still running after %ss. Sending SIGKILL to:\n' "$wait_seconds"
+		_print_processes "${alive[@]}"
+		kill -KILL "${alive[@]}" 2>/dev/null || true
+		sleep 0.2
+	fi
+
+	alive=()
+	for pid in "${pids[@]}"; do
+		kill -0 "$pid" 2>/dev/null && alive+=("$pid")
+	done
+
+	if (( ${#alive[@]} )); then
+		echo "Unable to stop all processes:"
+		_print_processes "${alive[@]}"
+		return 1
+	fi
+
+	echo "Stopped."
+}
+
+## killport 3000 [wait_seconds] - stop process on a port, then force after timeout
 function killport() {
-	local pids; pids=$(lsof -ti:"$1" 2>/dev/null)
-	[[ -z "$pids" ]] && echo "No process on port $1" && return 1
-	echo "$pids" | xargs kill -9 && echo "Killed process(es) on port $1"
+	local port="$1"
+	local wait_seconds
+	local -a pids=()
+	local pid
+
+	[[ -n "$port" && "$port" =~ ^[0-9]+$ ]] || {
+		echo "Usage: killport PORT [wait_seconds]"
+		return 1
+	}
+
+	wait_seconds=$(_kill_wait_seconds "${2:-3}") || return 1
+
+	while IFS= read -r pid; do
+		[[ -n "$pid" ]] && pids+=("$pid")
+	done < <(lsof -ti:"$port" 2>/dev/null | sort -u)
+
+	(( ${#pids[@]} )) || {
+		echo "No process on port $port"
+		return 1
+	}
+
+	printf 'Processes on port %s:\n' "$port"
+	_print_processes "${pids[@]}"
+	_kill_with_timeout "$wait_seconds" "${pids[@]}"
 }
 
-## fkill - fuzzy search and kill processes
-function fkill() {
-	ps aux | fzf --header-lines=1 --multi | awk '{print $2}' | xargs kill -9
-}
+if [[ $- == *i* ]]; then
+	## fkill [wait_seconds] - fuzzy search and stop processes, then force after timeout
+	function fkill() {
+		local wait_seconds
+		local selection
+		local -a pids=()
+		local pid
 
-# Use Git's colored diff when available
-if hash git &>/dev/null; then
-	function diff() {
-		git diff --no-index --color-words "$@";
+		wait_seconds=$(_kill_wait_seconds "${1:-3}") || return 1
+		selection=$(ps aux | fzf --header-lines=1 --multi) || return 1
+
+		while IFS= read -r pid; do
+			[[ -n "$pid" ]] && pids+=("$pid")
+		done < <(printf '%s\n' "$selection" | awk 'NF { print $2 }' | sort -u)
+
+		(( ${#pids[@]} )) || return 1
+
+		echo "Selected processes:"
+		printf '%s\n' "$selection"
+		_kill_with_timeout "$wait_seconds" "${pids[@]}"
+	}
+
+	# Use Git's colored diff when available
+	if hash git &>/dev/null; then
+		function diff() {
+			git diff --no-index --color-words "$@";
+		}
+	fi
+
+	## fquick - fuzzy search all aliases and functions
+	# shellcheck disable=SC2016,SC2086,SC2296
+	function fquick() {
+		{
+			builtin alias | sed 's/^/[alias] /'
+			print -l ${(k)functions} | sed 's/^/[func]  /'
+		} | fzf --preview 'word=$(echo {} | awk "{print \$2}" | cut -d= -f1); type $word 2>/dev/null || builtin alias $word 2>/dev/null'
+	}
+
+	## falias - fuzzy search aliases, copy to clipboard
+	function falias() {
+		builtin alias | fzf --preview 'echo {}' | cut -d= -f1 | tr -d "\n" | pbcopy
 	}
 fi
-
-## fquick - fuzzy search all aliases and functions
-# shellcheck disable=SC2016,SC2086,SC2296
-function fquick() {
-	{
-		builtin alias | sed 's/^/[alias] /'
-		print -l ${(k)functions} | sed 's/^/[func]  /'
-	} | fzf --preview 'word=$(echo {} | awk "{print \$2}" | cut -d= -f1); type $word 2>/dev/null || builtin alias $word 2>/dev/null'
-}
-
-## falias - fuzzy search aliases, copy to clipboard
-function falias() {
-	builtin alias | fzf --preview 'echo {}' | cut -d= -f1 | tr -d "\n" | pbcopy
-}
 
 ## epoch [-ms|-ns] - get current Unix timestamp in seconds (default), milliseconds, or nanoseconds
 function epoch() {
@@ -274,40 +426,53 @@ function timeago() {
 	((diff < 0)) && echo "$result in the future" || echo "$result ago"
 }
 
-## dsh - docker shell into running container with fzf
-function dsh() {
-	docker exec -it "$(docker ps --format '{{.Names}}' | fzf)" sh;
-}
+if [[ $- == *i* ]]; then
+	## dsh - docker shell into running container with fzf
+	function dsh() {
+		docker exec -it "$(docker ps --format '{{.Names}}' | fzf)" sh;
+	}
 
-# rm files... - move to Trash instead of deleting (use \rm for real delete)
-rm() {
-  local trash="$HOME/.Trash"
-  for f in "$@"; do
-    [[ "$f" == -* ]] && continue
-    [[ -e "$f" ]] && mv "$f" "$trash/$(basename "$f")_$(date +%s)"
-  done
+	# rm files... - move to Trash instead of deleting (use \rm for real delete)
+	rm() {
+		local trash="$HOME/.Trash"
+		local f
+		for f in "$@"; do
+			[[ "$f" == -* ]] && continue
+			[[ -e "$f" ]] && mv "$f" "$trash/$(basename "$f")_$(date +%s)"
+		done
+	}
+fi
+
+# Collect ## doc-comments preceding lines matching a keyword from a file.
+# Usage: _collect_tips tips_array keyword file
+_collect_tips() {
+	local -n _tips_ref=$1
+	local keyword="$2" file="$3"
+	local comment="" line
+
+	while IFS= read -r line; do
+		if [[ $line == \#\#* ]]; then
+			comment="${line#\#\# }"
+		elif [[ -n $comment && $line == "$keyword "* ]]; then
+			_tips_ref+=("$comment")
+			comment=""
+		else
+			[[ -n $line ]] && comment=""
+		fi
+	done < "$file"
 }
 
 # Show a random alias or function tip (only ones with ## comments)
 # shellcheck disable=SC2053
 function _shell_tip() {
 	local -a tips
-	local files=(~/.aliases ~/.functions)
-	local patterns=("alias *" "function *")
+	_collect_tips tips "alias" ~/.aliases
+	_collect_tips tips "function" ~/.functions
 
-	for i in {1..2}; do
-		local comment=""
-		while IFS= read -r line; do
-			if [[ $line == \#\#* ]]; then
-				comment="${line#\#\# }"
-			elif [[ $line == ${patterns[$i]} && -n $comment ]]; then
-				tips+=("$comment")
-				comment=""
-			else
-				[[ -n $line ]] && comment=""
-			fi
-		done < "${files[$i]}"
-	done
+	if (( ${#tips[@]} )); then
+		print "Tip: ${tips[RANDOM % ${#tips[@]} + 1]}"
+		return 0
+	fi
 
-	(( ${#tips[@]} )) && print "Tip: ${tips[RANDOM % ${#tips[@]} + 1]}"
+	return 1
 }
