@@ -150,6 +150,9 @@ for file in ~/.{path,exports,aliases,functions,extra}; do
 done;
 unset file;
 
+# Load secrets (API keys etc.) — not committed to git
+[ -f ~/.secrets ] && source ~/.secrets
+
 # Load Nix environment if available
 if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
   . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'

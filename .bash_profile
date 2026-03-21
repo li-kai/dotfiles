@@ -104,4 +104,8 @@ export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
 # use homebrew curl
 export PATH="/opt/homebrew/opt/curl/bin:$PATH"
 
+# Load secrets (API keys etc.) — not committed to git
+[ -f ~/.secrets ] && source ~/.secrets
+
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
