@@ -1,4 +1,6 @@
-#!/usr/bin/env bash
+# Interactive shell aliases. Zsh is the primary target; bash loads this file only in interactive sessions.
+
+if [[ $- == *i* ]]; then
 
 # Easier navigation: .., ..., ...., ....., ~ and -
 alias ..="cd .."
@@ -9,7 +11,7 @@ alias ~="cd ~" # `cd` is probably faster to type though
 alias -- -="cd -"
 
 # Shortcuts
-alias cc="claude --disallowedTools \"EnterPlanMode,ExitPlanMode,EnterWorktree,NotebookEdit\""
+alias cc="claude --disallowedTools \"EnterPlanMode,ExitPlanMode,EnterWorktree,ExitWorktree,NotebookEdit,CronCreate,CronDelete,CronList\""
 alias dl="cd ~/Downloads"
 alias dt="cd ~/Desktop"
 alias g="git"
@@ -108,3 +110,5 @@ alias ports='lsof -i -P -n | grep LISTEN'
 alias isotime='date -u +"%Y-%m-%dT%H:%M:%SZ"'
 
 alias timestamp='epoch'
+
+fi
