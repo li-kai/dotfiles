@@ -128,12 +128,12 @@ add-zsh-hook chpwd auto_venv
 
 # Background git fetch on cd into repo (smart throttling)
 auto_git_fetch() {
-  if git rev-parse --is-inside-work-tree &>/dev/null; then
-    local fetch_head=".git/FETCH_HEAD"
-    # Only fetch if FETCH_HEAD doesn't exist or is older than 60 minutes
-    if [[ ! -f "$fetch_head" ]] || [[ -n $(find "$fetch_head" -mmin +60 2>/dev/null) ]]; then
-      (git fetch --quiet &)
-    fi
+  local git_dir
+  git_dir=$(git rev-parse --git-dir 2>/dev/null) || return
+  local fetch_head="$git_dir/FETCH_HEAD"
+  # Only fetch if FETCH_HEAD doesn't exist or is older than 60 minutes
+  if [[ ! -f "$fetch_head" ]] || [[ -n $(find "$fetch_head" -mmin +60 2>/dev/null) ]]; then
+    (git fetch --quiet &)
   fi
 }
 add-zsh-hook chpwd auto_git_fetch
