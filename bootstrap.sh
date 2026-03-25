@@ -33,6 +33,7 @@ function linkIt() {
 			-maxdepth 1 \
 			-not -name assets \
 			-not -name .git \
+			-not -name .claude \
 			-not -name .DS_Store \
 			-not -name "*.sh" \
 			-not -name "*.md" \
@@ -148,7 +149,6 @@ echo "3. To enable git maintenance for specific repos, cd into them and run:"
 echo "   git maintenance register"
 echo ""
 
-source ~/.bash_profile
 unset linkIt
 
 echo "Done. Reload your terminal to see the changes."
