@@ -74,8 +74,8 @@ setopt CORRECT                   # Suggest corrections for typos
 SPROMPT='zsh: correct %F{red}%R%f to %F{green}%r%f? [n]o [y]es [a]bort [e]dit: '
 
 # Word handling - Ctrl+W stops at path separators
-WORDCHARS='*?[]~&;!#$%^(){}<>'
 autoload -Uz select-word-style && select-word-style bash
+WORDCHARS='*?[]~&;!#$%^(){}<>'
 
 # Load plugins from ~/.config/zsh/plugins/
 source ~/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh
