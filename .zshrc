@@ -7,6 +7,17 @@ export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
 export PATH="/opt/homebrew/opt/grep/libexec/gnubin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 
+# Load shell dotfiles early — EDITOR, LANG, etc. must be set before tool init
+# * ~/.path can be used to extend `$PATH`.
+# * ~/.extra can be used for other settings you don't want to commit.
+for file in ~/.{path,exports,aliases,functions,extra}; do
+	[ -r "$file" ] && [ -f "$file" ] && source "$file";
+done;
+unset file;
+
+# Load secrets (API keys etc.) — not committed to git
+[ -f ~/.secrets ] && source ~/.secrets
+
 # Use emacs keybindings
 bindkey -e
 
@@ -141,17 +152,6 @@ eval "$(zoxide init zsh)"                 # enable zoxide
 export FZF_DEFAULT_COMMAND="rg"
 export FZF_DEFAULT_OPTS="--height 40% --tmux bottom,40% --layout=reverse"
 FZF_ALT_C_COMMAND= source <(fzf --zsh)    # enable fzf
-
-# Load the shell dotfiles, and then some:
-# * ~/.path can be used to extend `$PATH`.
-# * ~/.extra can be used for other settings you don't want to commit.
-for file in ~/.{path,exports,aliases,functions,extra}; do
-	[ -r "$file" ] && [ -f "$file" ] && source "$file";
-done;
-unset file;
-
-# Load secrets (API keys etc.) — not committed to git
-[ -f ~/.secrets ] && source ~/.secrets
 
 # Load Nix environment if available
 if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
