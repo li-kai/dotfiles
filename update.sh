@@ -6,9 +6,8 @@
 set -e
 
 # Check if we are in the right directory
-if [ ! -f "bootstrap.sh" ] || [ ! -d ".omz" ]; then
+if [ ! -f "bootstrap.sh" ]; then
 	echo "Error: This script must be run from the dotfiles repository root."
-	echo "Make sure you're in the directory containing bootstrap.sh and .omz/"
 	exit 1
 fi
 
@@ -36,7 +35,7 @@ git submodule update --remote --recursive
 if [[ $(git status --porcelain) ]]; then
 	echo ""
 	echo "Submodules have been updated. You may want to commit these changes:"
-	echo "  git add .gitmodules .omz/"
+	echo "  git add .gitmodules .config/zsh/plugins/"
 	echo "  git commit -m 'Update submodules to latest versions'"
 	echo ""
 	echo "Current submodule status:"
