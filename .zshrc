@@ -125,6 +125,7 @@ auto_venv() {
   fi
 }
 add-zsh-hook chpwd auto_venv
+auto_venv
 
 # Background git fetch on cd into repo (smart throttling)
 auto_git_fetch() {
@@ -149,7 +150,7 @@ function set_win_title(){
 starship_precmd_user_func="set_win_title"
 
 eval "$(zoxide init zsh)"                 # enable zoxide
-export FZF_DEFAULT_COMMAND="rg"
+export FZF_DEFAULT_COMMAND="rg --files --hidden --glob '!.git' --glob '!.DS_Store'"
 export FZF_DEFAULT_OPTS="--height 40% --tmux bottom,40% --layout=reverse"
 FZF_ALT_C_COMMAND= source <(fzf --zsh)    # enable fzf
 
