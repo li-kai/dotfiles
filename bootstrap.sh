@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-OPTIND=1
 
 # Check if we are in the right directory
 cd "$(dirname "${BASH_SOURCE}")" || exit;
@@ -10,17 +9,54 @@ cd "$(dirname "${BASH_SOURCE}")" || exit;
 # 	exit 1
 # fi
 
+while [[ $# -gt 0 ]]; do
+	case "$1" in
+		-f) FORCE=1 ;;
+		-n|--dry-run) DRY_RUN=1 ;;
+		*) echo "Usage: $0 [-f] [-n|--dry-run]" >&2
+			echo "  -f           Force installation without confirmation" >&2
+			echo "  -n,--dry-run Show what would be done without making changes" >&2
+			echo "" >&2
+			echo "For updating dotfiles and submodules, use: ./update.sh" >&2
+			exit 1 ;;
+	esac
+	shift
+done
+
 # Ask for the administrator password upfront
-sudo -v
+if [ "$DRY_RUN" != "1" ]; then
+	sudo -v
+fi
+
+_run() {
+	if [ "$DRY_RUN" == "1" ]; then
+		echo "[dry-run] $*"
+	else
+		"$@"
+	fi
+}
+
+_link() {
+	local source="$1" target="$2"
+	if [ -L "$target" ] || [ -e "$target" ]; then
+		_run rm -rf "$target"
+	fi
+	_run ln -sfv "$source" "$target"
+}
 
 function linkIt() {
+	if [ "$DRY_RUN" == "1" ]; then
+		echo "=== Dry run — no changes will be made ==="
+		echo ""
+	fi
+
 	# Install starship prompt if not already installed
 	if ! command -v starship &> /dev/null; then
-		brew install starship
+		_run brew install starship
 	fi
 
 	# Initialize and update git submodules for zsh plugins
-	git submodule update --init --recursive
+	_run git submodule update --init --recursive
 
 	# Symlink files and directories
 	local paths
@@ -44,29 +80,20 @@ function linkIt() {
 		relative_path=${path#"$(pwd)"/}
 		if [[ "$relative_path" == .macos ]]; then
 			# For .macos folder, symlink its contents directly to home
+			# (only directories — scripts like brew.sh/settings.sh are skipped)
 			for item in "$path"/*; do
 				target_name="$(basename "$item")"
 				# Skip Application Support directory
 				if [[ "$target_name" == "Application Support" ]]; then
 					continue
 				fi
-
-				target_path="$HOME/$target_name"
-
-				source_path="$item"
 				if [ -d "$item" ]; then
-					source_path="$item/"
+					_link "$item/" "$HOME/$target_name"
 				fi
-
-				# Remove existing symlink or file/directory if it exists
-				if [ -L "$target_path" ] || [ -e "$target_path" ]; then
-					rm -rf "$target_path"
-				fi
-
-				ln -sfv "$source_path" "$target_path"
 			done
 		elif [[ "$relative_path" == .config ]]; then
 			# For .config folder, symlink its contents to ~/.config/
+			_run mkdir -p "$HOME/.config"
 			for item in "$path"/*; do
 				target_name="$(basename "$item")"
 				target_path="$HOME/.config/$target_name"
@@ -76,42 +103,20 @@ function linkIt() {
 					source_path="$item/"
 				fi
 
-				# Remove existing symlink or file/directory if it exists
-				if [ -L "$target_path" ] || [ -e "$target_path" ]; then
-					rm -rf "$target_path"
-				fi
-
-				ln -sfv "$source_path" "$target_path"
+				_link "$source_path" "$target_path"
 			done
 		else
 			source_path="$path"
 			if [ -d "$path" ]; then
 				source_path="$path/"
 			fi
-			target_path="$HOME/$relative_path"
 
-			# Remove existing symlink or file if it exists
-			if [ -L "$target_path" ] || [ -e "$target_path" ]; then
-				rm -rf "$target_path"
-			fi
-
-			ln -sfv "$source_path" "$target_path"
+			_link "$source_path" "$HOME/$relative_path"
 		fi
 	done
 }
 
-while getopts "f" opt; do
-	case "$opt" in
-		f) FORCE=1 ;;
-		*) echo "Usage: $0 [-f]" >&2
-			echo "  -f    Force installation without confirmation" >&2
-			echo "" >&2
-			echo "For updating dotfiles and submodules, use: ./update.sh" >&2
-			exit 1 ;;
-	esac
-done
-
-if [ "$FORCE" == "1" ]; then
+if [ "$DRY_RUN" == "1" ] || [ "$FORCE" == "1" ]; then
 	linkIt
 else
 	read -r -p "This may overwrite existing files in your home directory. Are you sure? (y/n) " -n 1
@@ -121,34 +126,36 @@ else
 	fi
 fi
 
-echo ""
-echo "Setting up git maintenance..."
-# Start git maintenance for background optimization
-if git maintenance start 2>/dev/null; then
-	echo "Git maintenance started successfully"
-else
-	echo "Note: Git maintenance requires git 2.30+. Skipping."
+if [ "$DRY_RUN" != "1" ]; then
+	echo ""
+	echo "Setting up git maintenance..."
+	if git maintenance start 2>/dev/null; then
+		echo "Git maintenance started successfully"
+	else
+		echo "Note: Git maintenance requires git 2.30+. Skipping."
+	fi
+	echo ""
 fi
-echo ""
-
-echo ""
-echo "Post-install steps:"
-echo ""
-echo "1. Edit .gitconfig.local in the dotfiles repo with your personal git settings:"
-echo "   [user]"
-echo "       name = Your Name"
-echo "       email = your@email.com"
-echo "       signingkey = /path/to/your/key.pub"
-echo "   (This file is gitignored and symlinked to ~/.gitconfig.local)"
-echo ""
-echo "2. Download Efficient Compression Tool (ect):"
-echo "   https://github.com/fhanau/Efficient-Compression-Tool/releases"
-echo "   sudo mv ~/Downloads/ect /usr/local/bin/"
-echo ""
-echo "3. To enable git maintenance for specific repos, cd into them and run:"
-echo "   git maintenance register"
-echo ""
 
 unset linkIt
 
-echo "Done. Reload your terminal to see the changes."
+if [ "$DRY_RUN" != "1" ]; then
+	echo ""
+	echo "Post-install steps:"
+	echo ""
+	echo "1. Edit .gitconfig.local in the dotfiles repo with your personal git settings:"
+	echo "   [user]"
+	echo "       name = Your Name"
+	echo "       email = your@email.com"
+	echo "       signingkey = /path/to/your/key.pub"
+	echo "   (This file is gitignored and symlinked to ~/.gitconfig.local)"
+	echo ""
+	echo "2. Download Efficient Compression Tool (ect):"
+	echo "   https://github.com/fhanau/Efficient-Compression-Tool/releases"
+	echo "   sudo mv ~/Downloads/ect /usr/local/bin/"
+	echo ""
+	echo "3. To enable git maintenance for specific repos, cd into them and run:"
+	echo "   git maintenance register"
+	echo ""
+	echo "Done. Reload your terminal to see the changes."
+fi
