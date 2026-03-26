@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# Environment variables shared between bash and zsh
 
 # Make vim the default editor.
 export EDITOR='vim';
@@ -25,4 +25,4 @@ export MANPAGER='less -X';
 
 # Avoid issues with `gpg` as installed via Homebrew.
 # https://stackoverflow.com/a/42265848/96656
-export GPG_TTY=$(tty);
+[[ -t 0 ]] && export GPG_TTY=$(tty);
