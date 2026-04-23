@@ -82,12 +82,13 @@
 	superprune = "!f() { \
 		echo 'Fetching and pruning...'; \
 		git fetch --prune; \
+		git worktree prune --expire now; \
 		echo ''; \
 		echo 'Deleting merged local branches...'; \
-		git branch --merged | grep -vE '^\\*|^\\s*(main|master|develop|staging)$' | xargs -r git branch -d; \
+		git branch --merged | grep -vE '^[*+]|^\\s*(main|master|develop|staging)$' | xargs -r git branch -d; \
 		echo ''; \
 		echo 'Deleting branches with deleted upstream (squash-merged)...'; \
-		git branch -vv | grep ': gone]' | grep -vE '^\\*|^\\s*(main|master|develop|staging)\\s' | awk '{print $1}' | xargs -r git branch -D; \
+		git branch -vv | grep ': gone]' | grep -vE '^[*+]|^\\s*(main|master|develop|staging)\\s' | awk '{print $1}' | xargs -r git branch -D; \
 		echo ''; \
 		echo 'Done!'; \
 	}; f"
@@ -217,6 +218,8 @@
 	abbreviateCommands = true
 	# Automatically arrange fixup!/squash! commits in interactive rebase
 	autoSquash = true
+	# Update branch refs during interactive rebase
+	updateRefs = true
 
 [rerere]
 
@@ -248,6 +251,16 @@
 	# Make `git push` push relevant annotated tags when pushing branches out.
 	followTags = true
 	autoSetupRemote = true
+
+[status]
+
+	# Compare against both upstream and push remote
+	compareBranches = @{upstream} @{push}
+
+[transfer]
+
+	# Validate object integrity during transfers
+	fsckObjects = true
 
 # URL shorthands
 
@@ -284,5 +297,5 @@
 
 [include]
 
-	# Machine-specific config (user, signing key, maintenance) - not committed
+	# Machine-specific config (user, signing key, maintenance, safe.directory) - not committed
 	path = ~/.gitconfig.local
