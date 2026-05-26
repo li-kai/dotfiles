@@ -44,18 +44,25 @@ function linkIt() {
 		if [[ "$relative_path" == .macos ]]; then
 			# For .macos folder, symlink its contents directly to home
 			for item in "$path"/*; do
-				# Only symlink directories
-				if [ -d "$item" ]; then
-					target_name="$(basename "$item")"
-					target_path="$HOME/$target_name"
-
-					# Remove existing symlink or directory if it exists
-					if [ -L "$target_path" ] || [ -e "$target_path" ]; then
-						rm -rf "$target_path"
-					fi
-
-					ln -sfv "$item" "$target_path"
+				target_name="$(basename "$item")"
+				# Skip Application Support directory
+				if [[ "$target_name" == "Application Support" ]]; then
+					continue
 				fi
+
+				target_path="$HOME/$target_name"
+
+				source_path="$item"
+				if [ -d "$item" ]; then
+					source_path="$item/"
+				fi
+
+				# Remove existing symlink or file/directory if it exists
+				if [ -L "$target_path" ] || [ -e "$target_path" ]; then
+					rm -rf "$target_path"
+				fi
+
+				ln -sfv "$source_path" "$target_path"
 			done
 		elif [[ "$relative_path" == .config ]]; then
 			# For .config folder, symlink its contents to ~/.config/
