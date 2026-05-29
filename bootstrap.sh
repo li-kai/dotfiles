@@ -69,7 +69,6 @@ function linkIt() {
 			-maxdepth 1 \
 			-not -name assets \
 			-not -name .git \
-			-not -name .claude \
 			-not -name .DS_Store \
 			-not -name "*.sh" \
 			-not -name "*.md" \
@@ -90,6 +89,17 @@ function linkIt() {
 				if [ -d "$item" ]; then
 					_link "$item/" "$HOME/$target_name"
 				fi
+			done
+		elif [[ "$relative_path" == claude ]]; then
+			# For claude folder, symlink its contents to ~/.claude/
+			_run mkdir -p "$HOME/.claude"
+			for item in "$path"/*; do
+				target_name="$(basename "$item")"
+				source_path="$item"
+				if [ -d "$item" ]; then
+					source_path="$item/"
+				fi
+				_link "$source_path" "$HOME/.claude/$target_name"
 			done
 		elif [[ "$relative_path" == .config ]]; then
 			# For .config folder, symlink its contents to ~/.config/
