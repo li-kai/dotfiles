@@ -11,7 +11,7 @@ alias ~="cd ~" # `cd` is probably faster to type though
 alias -- -="cd -"
 
 # Shortcuts
-alias cc="claude --disallowedTools \"EnterPlanMode,ExitPlanMode,EnterWorktree,ExitWorktree,NotebookEdit,CronCreate,CronDelete,CronList\""
+alias cc="claude --disallowedTools \"EnterPlanMode,ExitPlanMode,EnterWorktree,ExitWorktree,NotebookEdit,CronCreate,CronDelete,CronList,ScheduleWakeup,SendMessage,TeamCreate,TeamDelete,Workflow\""
 alias dl="cd ~/Downloads"
 alias dt="cd ~/Desktop"
 alias g="git"
