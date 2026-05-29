@@ -780,9 +780,13 @@ done
 # Update Rectangle settings                                                   #
 ###############################################################################
 
-# copy folders in .macos/Application Support to /Library/Application Support
-# we don't symlink because apps will overwrite them
-rsync --exclude ".DS_Store" -a --no-perms ./Application\ Support/ ~/Library/Application\ Support/
+# Rectangle stores its config in cfprefs, not Application Support, so import
+# the exported plist via `defaults` rather than symlinking. Restart Rectangle
+# (and flush cfprefsd) so the imported settings take effect.
+if [ -f ./Rectangle.plist ]; then
+	defaults import com.knollsoft.Rectangle ./Rectangle.plist
+	killall cfprefsd Rectangle &> /dev/null || true
+fi
 
 files=()
 while read -r file; do
@@ -795,6 +799,7 @@ done < <(
 		-not -name "*.sh" \
 		-not -name "*.md" \
 		-not -name "*.txt" \
+		-not -name "*.plist" \
 		2> /dev/null
 )
 
