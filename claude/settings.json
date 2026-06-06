@@ -312,7 +312,7 @@
 			"Bash(pnpm lint:*)",
 			"Bash(pnpm exec prettier *)",
 			"Bash(pnpm -w prettier *)",
-			"mcp__plugin_playwright_playwright__browser_*",
+			"mcp__plugin_playwright_playwright__*",
 			"mcp__paper__*"
 		],
 		"deny": [
@@ -348,6 +348,13 @@
 			"Bash(open *)"
 		],
 		"defaultMode": "auto"
+	},
+	"skillOverrides": {
+		"keybindings-help": "off",
+		"claude-api": "off",
+		"init": "off",
+		"run": "off",
+		"fewer-permission-prompts": "off"
 	},
 	"hooks": {
 		"SessionStart": [
@@ -405,9 +412,10 @@
 	"awaySummaryEnabled": false,
 	"autoMemoryEnabled": false,
 	"skipDangerousModePermissionPrompt": true,
+	"skipWorkflowUsageWarning": true,
 	"theme": "dark",
 	"verbose": true,
 	"preferredNotifChannel": "auto",
 	"autoCompactEnabled": true,
-	"skipAutoPermissionPrompt": true
+	"skipAutoPermissionPrompt": true,
 }
