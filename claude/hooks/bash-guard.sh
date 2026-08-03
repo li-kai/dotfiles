@@ -107,6 +107,3 @@ if [[ $CMD == *">"* ]]; then
     block "Shell redirect to absolute or home path blocked. Use the Edit/Write tools for file writes."
   fi
 fi
-
-# Cargo-to-just rewriting is owned by each project's .claude/settings.json.
-# Projects that want it need their own PreToolUse hook.
