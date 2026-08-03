@@ -6,7 +6,15 @@
 		"CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1",
 		"ENABLE_LSP_TOOL": "1",
 		"RIPGREP_CONFIG_PATH": "",
-		"CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "80"
+		"CLAUDE_CODE_AUTO_COMPACT_WINDOW": "256000",
+		"CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "80",
+		"ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6[1m]",
+		"ANTHROPIC_DEFAULT_SONNET_MODEL_NAME": "Sonnet (1M context)",
+		"ANTHROPIC_DEFAULT_SONNET_MODEL_DESCRIPTION": "Sonnet 4.6 with 1M context",
+		"ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-0[1m]",
+		"ANTHROPIC_DEFAULT_OPUS_MODEL_NAME": "Opus (1M context)",
+		"ANTHROPIC_DEFAULT_OPUS_MODEL_DESCRIPTION": "Opus 5.0 with 1M context",
+		"ENABLE_TOOL_SEARCH": "true"
 	},
 	"attribution": {
 		"commit": "",
@@ -101,7 +109,19 @@
 			"Bash(gh issue list *)",
 			"Bash(gh issue view *)",
 			"Bash(gh label list *)",
+			"Bash(gh pr checkout *)",
+			"Bash(gh pr checks *)",
+			"Bash(gh pr close *)",
+			"Bash(gh pr comment *)",
+			"Bash(gh pr comment)",
+			"Bash(gh pr create *)",
+			"Bash(gh pr create)",
+			"Bash(gh pr diff *)",
+			"Bash(gh pr diff)",
+			"Bash(gh pr edit *)",
 			"Bash(gh pr list *)",
+			"Bash(gh pr ready *)",
+			"Bash(gh pr review *)",
 			"Bash(gh pr view *)",
 			"Bash(gh release list *)",
 			"Bash(gh release view *)",
@@ -316,6 +336,16 @@
 			"mcp__paper__*"
 		],
 		"deny": [
+			"Bash(gh auth login *)",
+			"Bash(gh auth login)",
+			"Bash(gh auth logout *)",
+			"Bash(gh auth logout)",
+			"Bash(gh auth refresh *)",
+			"Bash(gh auth token *)",
+			"Bash(gh gpg-key *)",
+			"Bash(gh repo delete *)",
+			"Bash(gh secret *)",
+			"Bash(gh ssh-key *)",
 			"Read(**/.env)",
 			"Read(**/.env.*)",
 			"Read(~/.aws/**)",
@@ -344,17 +374,22 @@
 			"Bash(pnpm install *)",
 			"Bash(pnpm update *)",
 			"Bash(pnpm upgrade *)",
+			"Bash(gh pr merge *)",
 			"Bash(gh browse *)",
 			"Bash(open *)"
 		],
 		"defaultMode": "auto"
 	},
+	"model": "opus",
+	"availableModels": ["haiku", "sonnet[1m]", "opus[1m]"],
 	"skillOverrides": {
 		"keybindings-help": "off",
 		"claude-api": "off",
 		"init": "off",
 		"run": "off",
-		"fewer-permission-prompts": "off"
+		"fewer-permission-prompts": "off",
+		"loop": "off",
+		"update-config": "off"
 	},
 	"hooks": {
 		"SessionStart": [
@@ -391,13 +426,15 @@
 			}
 		]
 	},
+	"workflowKeywordTriggerEnabled": false,
 	"statusLine": {
 		"type": "command",
 		"command": "bash ~/.claude/statusline-command.sh"
 	},
 	"enabledPlugins": {
 		"pyright-lsp@claude-plugins-official": true,
-		"typescript-lsp@claude-plugins-official": true
+		"typescript-lsp@claude-plugins-official": true,
+		"craft@kai": true
 	},
 	"extraKnownMarketplaces": {
 		"claude-plugins-official": {
@@ -405,17 +442,22 @@
 				"source": "github",
 				"repo": "anthropics/claude-plugins-official"
 			}
+		},
+		"kai": {
+			"source": {
+				"source": "github",
+				"repo": "li-kai/skills"
+			}
 		}
 	},
-	"effortLevel": "low",
+	"effortLevel": "medium",
 	"promptSuggestionEnabled": false,
 	"awaySummaryEnabled": false,
 	"autoMemoryEnabled": false,
 	"skipDangerousModePermissionPrompt": true,
 	"skipWorkflowUsageWarning": true,
 	"theme": "dark",
-	"verbose": true,
 	"preferredNotifChannel": "auto",
 	"autoCompactEnabled": true,
-	"skipAutoPermissionPrompt": true,
+	"skipAutoPermissionPrompt": true
 }
