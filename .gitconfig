@@ -299,6 +299,7 @@
 
 	# Machine-specific config (user, signing key, maintenance, safe.directory) - not committed
 	path = ~/.gitconfig.local
+# Clear inherited helpers before routing GitHub credentials through gh.
 [credential "https://github.com"]
 	helper =
 	helper = !/opt/homebrew/bin/gh auth git-credential
