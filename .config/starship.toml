@@ -1,95 +1,22 @@
-# Jetpack preset - a pseudo-minimalist theme inspired by geometry and spaceship prompts
-# https://starship.rs/presets/jetpack
 "$schema" = 'https://starship.rs/config-schema.json'
 
 add_newline = true
+command_timeout = 150
 continuation_prompt = "[▸▹ ](dimmed white)"
 
-format = """($nix_shell$container${custom.tip}$fill$git_metrics\n)$cmd_duration\
+format = """($nix_shell$fill$git_metrics\n)$cmd_duration\
 $hostname\
 $localip\
-$shlvl\
-$shell\
-$env_var\
 $jobs\
 $sudo\
+$status\
 $character\
 $username\
 $directory"""
 
-right_format = """
-$singularity\
-$kubernetes\
-$vcsh\
-$fossil_branch\
-$git_branch\
-$git_commit\
+right_format = """$git_branch\
 $git_state\
 $git_status\
-$hg_branch\
-$pijul_channel\
-$docker_context\
-$package\
-$c\
-$cpp\
-$cmake\
-$cobol\
-$daml\
-$dart\
-$deno\
-$dotnet\
-$elixir\
-$elm\
-$erlang\
-$fennel\
-$fortran\
-$golang\
-$guix_shell\
-$haskell\
-$haxe\
-$helm\
-$java\
-$julia\
-$kotlin\
-$gradle\
-$lua\
-$nim\
-$nodejs\
-$ocaml\
-$opa\
-$perl\
-$php\
-$pulumi\
-$purescript\
-$python\
-$raku\
-$rlang\
-$red\
-$ruby\
-$rust\
-$scala\
-$solidity\
-$swift\
-$terraform\
-$vlang\
-$vagrant\
-$xmake\
-$zig\
-$buf\
-$conda\
-$pixi\
-$meson\
-$spack\
-$memory_usage\
-$aws\
-$gcloud\
-$openstack\
-$azure\
-$crystal\
-$custom\
-$status\
-$os\
-$battery\
 $time"""
 
 [fill]
@@ -104,10 +31,6 @@ vimcmd_symbol = "[■](dimmed green)"
 vimcmd_replace_one_symbol = "◌"
 vimcmd_replace_symbol = "□"
 vimcmd_visual_symbol = "▼"
-
-[env_var.VIMSHELL]
-format = "[$env_value]($style)"
-style = 'green italic'
 
 [sudo]
 format = "[$symbol]($style)"
@@ -146,32 +69,18 @@ ssh_only = true
 format = " ◯[$localipv4](bold magenta)"
 disabled = false
 
+[status]
+disabled = false
+format = "[$symbol$status]($style) "
+symbol = "✗"
+style = "bold red"
+
 [time]
 disabled = false
 format = "[ $time]($style)"
 time_format = "%R"
 utc_time_offset = "local"
 style = "italic dimmed white"
-
-[battery]
-format = "[ $percentage $symbol]($style)"
-full_symbol = "█"
-charging_symbol = "[↑](italic bold green)"
-discharging_symbol = "↓"
-unknown_symbol = "░"
-empty_symbol = "▃"
-
-[[battery.display]]
-threshold = 20
-style = "italic bold red"
-
-[[battery.display]]
-threshold = 60
-style = "italic dimmed bright-purple"
-
-[[battery.display]]
-threshold = 70
-style = "italic dimmed yellow"
 
 [git_branch]
 format = " [$symbol$branch(:$remote_branch)]($style)"
@@ -181,9 +90,6 @@ truncation_symbol = "⋯"
 truncation_length = 11
 only_attached = true
 
-[git_commit]
-format ="[$hash$tag]($style) "
-
 [git_metrics]
 format = '([▴$added]($added_style))([▿$deleted]($deleted_style))'
 added_style = 'italic dimmed green'
@@ -192,6 +98,7 @@ ignore_submodules = true
 disabled = false
 
 [git_status]
+ignore_submodules = false
 style = "dimmed white"
 format = "[\\[$ahead_behind$staged$modified$untracked$renamed$deleted$conflicted$stashed\\]]($style)"
 conflicted = "[!](italic bright-magenta)"
@@ -205,121 +112,6 @@ staged = "[+](italic bright-cyan)"
 renamed = "[→](italic bright-blue)"
 deleted = "[-](italic red)"
 
-[deno]
-format = " [deno](italic) [$symbol($version)]($style)"
-version_format = "${raw}"
-
-[lua]
-format = " [lua](italic) [${symbol}${version}]($style)"
-version_format = "${raw}"
-symbol = " "
-style = "bold bright-yellow"
-
-[nodejs]
-format = " [node](italic) [${symbol}($version)]($style)"
-version_format = "${raw}"
-symbol = " "
-style ="bold bright-green"
-detect_files = ["package.json"]
-detect_folders = ["node_modules"]
-detect_extensions = []
-
-[python]
-format = " [py](italic) [${symbol}${version}]($style)"
-symbol = " "
-version_format = "${raw}"
-style = "bold bright-yellow"
-
-[ruby]
-format = " [rb](italic) [${symbol}${version}]($style)"
-symbol = " "
-version_format = "${raw}"
-style = "bold red"
-
-[rust]
-format = " [rs](italic) [$symbol$version]($style)"
-symbol = "󱘗 "
-version_format = "${raw}"
-style = "bold red"
-
-[package]
-format = " [pkg](italic dimmed) [$symbol$version]($style)"
-version_format = "${raw}"
-symbol = "󰏗 "
-style = "dimmed yellow italic bold"
-
-[swift]
-format = " [sw](italic) [${symbol}${version}]($style)"
-symbol = " "
-style = "bold bright-red"
-version_format = "${raw}"
-
-[aws]
-disabled = true
-format = " [aws](italic) [$symbol $profile $region]($style)"
-style = "bold blue"
-symbol = " "
-
-[buf]
-symbol = " "
-format = " [buf](italic) [$symbol $version $buf_version]($style)"
-
-[c]
-symbol = " "
-format = " [$symbol($version(-$name))]($style)"
-
-[cpp]
-symbol = " "
-format = " [$symbol($version(-$name))]($style)"
-
-[conda]
-symbol = " "
-format = " conda [$symbol$environment]($style)"
-
-[pixi]
-symbol = "󰏗 "
-format = " pixi [$symbol$version ($environment )]($style)"
-
-[dart]
-symbol = " "
-format = " dart [$symbol($version )]($style)"
-
-[docker_context]
-symbol = " "
-format = " docker [$symbol$context]($style)"
-
-[elixir]
-symbol = " "
-format = " exs [$symbol $version OTP $otp_version ]($style)"
-
-[elm]
-symbol = " "
-format = " elm [$symbol($version )]($style)"
-
-[golang]
-symbol = " "
-format = " go [$symbol($version )]($style)"
-
-[haskell]
-symbol = " "
-format = " hs [$symbol($version )]($style)"
-
-[java]
-symbol = " "
-format = " java [${symbol}(${version} )]($style)"
-
-[julia]
-symbol = " "
-format = " jl [$symbol($version )]($style)"
-
-[memory_usage]
-symbol = "󰍛 "
-format = " mem [${ram}( ${swap})]($style)"
-
-[nim]
-symbol = "󰆥 "
-format = " nim [$symbol($version )]($style)"
-
 [nix_shell]
 style = 'bold italic dimmed blue'
 symbol = " "
@@ -327,15 +119,3 @@ format = '[$symbol nix $state]($style) [$name](italic dimmed white)'
 impure_msg = '[⌽](bold dimmed red)'
 pure_msg = '[⌾](bold dimmed green)'
 unknown_msg = '[◌](bold dimmed yellow)'
-
-[spack]
-symbol = "◇ "
-format = " spack [$symbol$environment]($style)"
-
-[custom.tip]
-command = 'source ~/.functions && _shell_tip'
-when = '[ $((RANDOM % 20)) -eq 0 ]'
-shell = ['zsh', '-c']
-use_stdin = false
-format = '[$output ]($style)'
-style = 'italic dimmed white'

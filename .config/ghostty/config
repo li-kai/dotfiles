@@ -2,7 +2,6 @@
 
 theme = Material Theme Default
 scrollback-limit = 262144
-keybind = shift+enter=text:\x1b\r
 selection-clear-on-typing = true
 copy-on-select = true
 split-inherit-working-directory = true
