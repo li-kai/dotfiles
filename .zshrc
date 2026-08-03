@@ -198,11 +198,14 @@ _starship_init_zsh() {
 _cached_shell_init "$_starship_cache" "$commands[starship]" "$_starship_config" -- _starship_init_zsh "$commands[starship]"
 unfunction _starship_init_zsh
 unset _starship_cache _starship_config
-function prompt_precmd() {
+function set_win_title() {
     printf '\e]0; %s \a' "${PWD:t}"
+}
+function maybe_show_shell_tip() {
     (( RANDOM % 20 )) || _shell_tip
 }
-add-zsh-hook precmd prompt_precmd
+add-zsh-hook precmd set_win_title
+add-zsh-hook precmd maybe_show_shell_tip
 
 _cached_shell_init zoxide.zsh "$commands[zoxide]" -- "$commands[zoxide]" init zsh
 unfunction _cached_shell_init
