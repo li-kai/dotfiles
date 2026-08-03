@@ -1,6 +1,8 @@
 # Ignore
 .extra
 .gitconfig.local
+/.cache/
+/.zcompdump
 
 # Compiled Python files
 *.pyc
@@ -21,6 +23,10 @@ Thumbs.db
 /bower_components
 /node_modules
 /npm-debug.log
+
+# Generated runtime guard command links
+/bin/runtime-guards/*
+!/bin/runtime-guards/_runtime-guard
 
 # Logs
 *.log

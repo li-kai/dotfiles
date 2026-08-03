@@ -19,7 +19,6 @@ brew "tree"
 brew "jq"
 brew "yq"
 brew "uv"
-brew "fnm"
 brew "starship"
 
 # CLI improvements

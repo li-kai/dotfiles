@@ -69,6 +69,10 @@ function linkIt() {
 			-maxdepth 1 \
 			-not -name assets \
 			-not -name .git \
+			-not -name .claude \
+			-not -name .codex \
+			-not -name .cache \
+			-not -name .zcompdump \
 			-not -name .DS_Store \
 			-not -name "*.sh" \
 			-not -name "*.md" \
@@ -92,6 +96,9 @@ function linkIt() {
 			done
 		elif [[ "$relative_path" == claude ]]; then
 			# For claude folder, symlink its contents to ~/.claude/
+			if [ -L "$HOME/.claude" ]; then
+				_run rm -f "$HOME/.claude"
+			fi
 			_run mkdir -p "$HOME/.claude"
 			for item in "$path"/*; do
 				target_name="$(basename "$item")"
@@ -126,13 +133,32 @@ function linkIt() {
 	done
 }
 
+setupRuntimeGuards() {
+	local guard_dir="$HOME/bin/runtime-guards"
+	local command_name
+	local guarded_commands=(
+		bun bunx corepack deno node nodejs npm npx
+		pip pip3 pipx pnpm pnpx python python3 yarn yarnpkg
+	)
+
+	_run mkdir -p "$guard_dir"
+	for command_name in "${guarded_commands[@]}"; do
+		_run ln -sfn _runtime-guard "$guard_dir/$command_name"
+	done
+}
+
 if [ "$DRY_RUN" == "1" ] || [ "$FORCE" == "1" ]; then
 	linkIt
+	setupRuntimeGuards
 else
 	read -r -p "This may overwrite existing files in your home directory. Are you sure? (y/n) " -n 1
 	echo
 	if [[ $REPLY =~ ^[Yy]$ ]]; then
 		linkIt
+		setupRuntimeGuards
+	else
+		echo "Installation cancelled."
+		exit 0
 	fi
 fi
 

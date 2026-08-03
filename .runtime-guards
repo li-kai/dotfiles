@@ -1,0 +1,22 @@
+# Block selected unmanaged runtimes outside Nix development environments.
+_prepend_runtime_guards() {
+	local guard_dir="$HOME/bin/runtime-guards"
+	[[ -z "${IN_NIX_SHELL:-}" ]] || return
+	case "$PATH" in
+		"$guard_dir"|"$guard_dir":*) return ;;
+	esac
+	[[ -d "$guard_dir" ]] || return
+
+	if [[ -n "${ZSH_VERSION:-}" ]]; then
+		path=(${path:#$guard_dir})
+		path=("$guard_dir" $path)
+		export PATH
+	else
+		local entry guarded_path="$guard_dir"
+		local IFS=:
+		for entry in $PATH; do
+			[[ "$entry" == "$guard_dir" ]] || guarded_path="$guarded_path:$entry"
+		done
+		export PATH="$guarded_path"
+	fi
+}

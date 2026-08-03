@@ -1,5 +1,45 @@
 # Shared shell functions. Zsh is the primary interactive shell; keep non-interactive helpers portable.
 
+# Cache deterministic shell init scripts until their dependencies change.
+_cached_shell_init() {
+	local name="$1"
+	shift
+	local executable="$1"
+	[[ -n "$executable" && -x "$executable" ]] || return
+	local cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/shell-init"
+	local cache_file="$cache_dir/$name"
+	local temporary_file="$cache_file.$$"
+	local dependency dependencies="" source_header cached_header="" rebuild=false
+
+	while [[ $# -gt 0 && "$1" != -- ]]; do
+		dependency="$1"
+		[[ -n "$dependency" && -e "$dependency" ]] || return
+		dependencies="${dependencies}${dependencies:+:}$dependency"
+		[[ "$dependency" -nt "$cache_file" ]] && rebuild=true
+		shift
+	done
+	[[ "$1" == -- ]] || return 2
+	shift
+	(( $# )) || return 2
+
+	source_header="# shell-init-dependencies: $dependencies"
+	[[ -r "$cache_file" ]] && IFS= read -r cached_header < "$cache_file"
+	if [[ ! -s "$cache_file" || "$cached_header" != "$source_header" || "${executable%/*}" -nt "$cache_file" ]]; then
+		rebuild=true
+	fi
+
+	if [[ "$rebuild" == true ]]; then
+		[[ -d "$cache_dir" ]] || mkdir -p "$cache_dir" || return
+		if { printf '%s\n' "$source_header"; "$@"; } >| "$temporary_file"; then
+			mv -f "$temporary_file" "$cache_file"
+		else
+			rm -f "$temporary_file"
+			return 1
+		fi
+	fi
+	source "$cache_file"
+}
+
 ## mkd foo/bar - create directory and cd into it
 function mkd() {
 	# shellcheck disable=SC2164
@@ -443,34 +483,29 @@ if [[ $- == *i* ]]; then
 	}
 fi
 
-# Collect ## doc-comments preceding lines matching a keyword from a file.
-# Usage: _collect_tips tips_array keyword file
-_collect_tips() {
-	local -n _tips_ref=$1
-	local keyword="$2" file="$3"
-	local comment="" line
-
-	while IFS= read -r line; do
-		if [[ $line == \#\#* ]]; then
-			comment="${line#\#\# }"
-		elif [[ -n $comment && $line == "$keyword "* ]]; then
-			_tips_ref+=("$comment")
-			comment=""
-		else
-			[[ -n $line ]] && comment=""
-		fi
-	done < "$file"
-}
-
 # Show a random alias or function tip (only ones with ## comments)
-# shellcheck disable=SC2053
 function _shell_tip() {
 	local -a tips
-	_collect_tips tips "alias" ~/.aliases
-	_collect_tips tips "function" ~/.functions
+	local comment file index keyword=alias line
+	for file in ~/.aliases ~/.functions; do
+		comment=""
+		while IFS= read -r line; do
+			if [[ $line == \#\#* ]]; then
+				comment="${line#\#\# }"
+			elif [[ -n $comment && $line == "$keyword "* ]]; then
+				tips+=("$comment")
+				comment=""
+			else
+				[[ -n $line ]] && comment=""
+			fi
+		done < "$file"
+		keyword=function
+	done
 
 	if (( ${#tips[@]} )); then
-		print "Tip: ${tips[RANDOM % ${#tips[@]} + 1]}"
+		index=$(( RANDOM % ${#tips[@]} ))
+		[[ -n "${ZSH_VERSION:-}" ]] && (( index++ ))
+		printf 'Tip: %s\n' "${tips[index]}"
 		return 0
 	fi
 

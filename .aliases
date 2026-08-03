@@ -12,6 +12,7 @@ alias -- -="cd -"
 
 # Shortcuts
 alias cc="claude --disallowedTools \"EnterPlanMode,ExitPlanMode,EnterWorktree,ExitWorktree,NotebookEdit,CronCreate,CronDelete,CronList,ScheduleWakeup,WaitForMcpServers,SendMessage,Workflow\""
+alias oc="opencode"
 alias dl="cd ~/Downloads"
 alias dt="cd ~/Desktop"
 alias g="git"
@@ -98,10 +99,6 @@ alias reload='exec ${SHELL} -l'
 
 ## path - print each PATH entry on a separate line
 alias path='echo -e ${PATH//:/\\n}'
-
-alias python='python3'
-
-alias nvm='fnm'
 
 ## ports - show listening ports
 alias ports='lsof -i -P -n | grep LISTEN'

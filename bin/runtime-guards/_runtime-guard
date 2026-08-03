@@ -1,0 +1,24 @@
+#!/bin/sh
+
+command_name=${0##*/}
+
+case "$command_name" in
+	python|python3)
+		hint="For one-off Python commands, use 'uv run' or 'uvx'."
+		;;
+	pip|pip3)
+		hint="For package management, use 'uv add' or 'uv pip install'."
+		;;
+	pipx)
+		hint="For Python tools, use 'uvx' or 'uv tool install'."
+		;;
+	*)
+		hint="For one-off tools, use 'nix run nixpkgs#<package> -- <args>'."
+		;;
+esac
+
+printf '%s\n' \
+	"$command_name is disabled outside a Nix development environment." \
+	"Run 'nix develop', or 'direnv allow' in a project configured for Nix." \
+	"$hint" >&2
+exit 127
